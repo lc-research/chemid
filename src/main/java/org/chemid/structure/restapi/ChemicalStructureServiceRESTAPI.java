@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * This class includes RESTful API methods for chemical structure service.
  */
-@Path("/rest")
+@Path("/rest/structure")
 public class ChemicalStructureServiceRESTAPI {
     /**
      * This method returns the version number of the chemical structure service.
