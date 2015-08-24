@@ -20,6 +20,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
  * The main method of this class deploys the chemical structure service on an embedded jetty server
  */
 public class Application {
+
+    /**
+     * A private constructor to hide implicit public constructor
+     */
+    private Application() {
+        //
+    }
+
     /**
      * This method starts an embedded instance of the jetty server and deploys the chemical structure service on it.
      *
@@ -29,10 +37,10 @@ public class Application {
     public static void main(String[] args) throws Exception {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        Server jettyServer = new Server(8080);
+        Server jettyServer = new Server(RESTAPIConstants.PORT_NO);
         jettyServer.setHandler(context);
         ServletHolder jerseyServlet = context.addServlet(org.glassfish.jersey.servlet.ServletContainer.class, "/*");
-        jerseyServlet.setInitOrder(0);
+        jerseyServlet.setInitOrder(RESTAPIConstants.INIT_ORDER);
         // Tells the Jersey Servlet which REST service/class to load.
         jerseyServlet.setInitParameter("jersey.config.server.provider.classnames",
                 ChemicalStructureServiceRESTAPI.class.getCanonicalName());
