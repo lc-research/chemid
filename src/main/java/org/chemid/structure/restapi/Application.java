@@ -9,25 +9,20 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-
 package org.chemid.structure.restapi;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-
 /**
  * The main method of this class deploys the chemical structure service on an embedded jetty server
  */
 public class Application {
-
     /**
      * A private constructor to hide implicit public constructor
      */
     private Application() {
         //
     }
-
     /**
      * This method starts an embedded instance of the jetty server and deploys the chemical structure service on it.
      *
