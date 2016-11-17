@@ -28,6 +28,8 @@ public class Constants {
         public static final String PUBCHEM_RESOURCES = "dbclient/pubchem/";
         public static final String PUBCHEM_DOWNLOAD_PAYLOAD_FILENAME = "download.xml";
         public static final String PUBCHEM_REQUEST_WebEnv_NAME = "WebEnv";
+        public static final String PUBCHEM_REQUEST_RESULT_COUNT = "Count";
+
         public static final String PUBCHEM_REQUEST_QueryKey_NAME = "QueryKey";
         public static final String PUBCHEM_PAYLOAD_WebEnv_NAME = "PCT-Entrez_webenv";
         public static final String PUBCHEM_PAYLOAD_QueryKey_NAME = "PCT-Entrez_query-key";
