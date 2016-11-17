@@ -18,16 +18,22 @@ import org.chemid.structure.dbclient.hmdb.HMDBClient;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
+import org.chemid.structure.exception.CatchException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
+import java.util.logging.FileHandler;
 
 /**
  * This class includes RESTful API methods for chemical structure service.
  */
 @Path("/rest/structure")
 public class ChemicalStructureServiceRESTAPI {
+    private static final Logger logger = LoggerFactory.getLogger(ChemicalStructureServiceRESTAPI.class);
+    FileHandler fh;
+
     /**
      * This method returns the version number of the chemical structure service.
      *
@@ -50,29 +56,39 @@ public class ChemicalStructureServiceRESTAPI {
                                         @PathParam("error") Double error,
                                         @PathParam("errorUnit") String errorUnit,
                                         @PathParam("fileFormat") String fileFormat,
-                                        @QueryParam("location") String location) throws IOException {
+                                        @QueryParam("location") String location) throws CatchException {
+        String sdfPath = null;
         String loc = location;
-        double searchMass = Tools.getSearchMass(mass, adduct);
-        error = Tools.getMassError(mass, error, errorUnit);
-        if (loc.trim().equals("null") || loc.trim().isEmpty() || loc.trim() == null ) {
-            loc = "D://";
-        } else {
-            loc = location;
+        try {
+            double searchMass = Tools.getSearchMass(mass, adduct);
+            error = Tools.getMassError(mass, error, errorUnit);
+            if (loc.trim().equals("null") || loc.trim().isEmpty() || loc.trim() == null) {
+                loc = "D://";
+            } else {
+                loc = location;
+            }
+
+
+            switch (database.toLowerCase().trim()) {
+                case "pubchem":
+                    String massRange = PubchemTools.getMassRange(searchMass, error);
+                    PubChemClient pubChemClient = new PubChemClient();
+                    String Url = pubChemClient.getDownloadURL(massRange);
+                    sdfPath = pubChemClient.saveFile(Url, loc.trim());
+
+                case "chemspider":
+                    ChemSpiderClient client = ChemSpiderClient.getInstance(Constants.ChemSpiderConstants.TOKEN, true);
+                    sdfPath = client.getChemicalStructuresByMass(searchMass, error, loc.trim());
+
+                case "hmdb":
+                    HMDBClient hmdbClient = new HMDBClient();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to retrieve data from databases : " + e);
         }
-        switch (database.toLowerCase().trim()) {
-            case "pubchem":
-                String massRange = PubchemTools.getMassRange(searchMass, error);
-                PubChemClient pubChemClient = new PubChemClient();
-                String Url = pubChemClient.getDownloadURL(massRange);
-                return pubChemClient.saveFile(Url, loc.trim());
-            case "chemspider":
-                ChemSpiderClient client = ChemSpiderClient.getInstance(Constants.ChemSpiderConstants.TOKEN, true);
-                return client.getChemicalStructuresByMass(searchMass, error, loc.trim());
-            case "hmdb":
-                HMDBClient hmdbClient = new HMDBClient();
-                return "hmdb";
-            default:
-                return "incorrect db";
+        if(sdfPath == null){
+            sdfPath = database.toLowerCase()+" not returning compounds for given mass range";
         }
+        return sdfPath;
     }
 }
