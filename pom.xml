@@ -131,6 +131,11 @@
             <artifactId>gson-xml-java</artifactId>
             <version>${gson.xml.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.streamsupport</groupId>
+            <artifactId>streamsupport</artifactId>
+            <version>1.5.1</version>
+        </dependency>
     </dependencies>
 
     <build>
