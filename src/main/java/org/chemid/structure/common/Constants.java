@@ -21,7 +21,7 @@ public class Constants {
     }
     public static class HMDBConstants{
         public static final String HMDB_RESOURCES = "dbclient/hmdb/";
-        public static final String HMDB_OUTPUT_FILE = "output.sdf";
+        public static final String HMDB_OUTPUT_FILE = "hmdb.sdf";
         public static final String HMDB_MOLECULAR_WEIGHT = "MIMW";
 
     }
