@@ -15,6 +15,7 @@ package org.chemid.structure.restapi;
 import org.chemid.structure.common.Constants;
 import org.chemid.structure.dbclient.chemspider.ChemSpiderClient;
 import org.chemid.structure.dbclient.hmdb.HMDBClient;
+import org.chemid.structure.dbclient.hmdb.utilities.HMDBTools;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.net.URL;
 import java.util.logging.FileHandler;
 
 /**
@@ -82,6 +84,7 @@ public class ChemicalStructureServiceRESTAPI {
 
                 case "hmdb":
                     HMDBClient hmdbClient = new HMDBClient();
+                    sdfPath = hmdbClient.readSDF(HMDBTools.getLowerMassValue(searchMass,error),HMDBTools.getUpperMassValue(searchMass,error),loc.trim());
             }
         } catch (Exception e) {
             logger.error("Failed to retrieve data from databases : " + e);

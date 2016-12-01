@@ -19,14 +19,22 @@ public class Constants {
         public static Integer SO_TIME_OUT = 18000;
         public static Integer THREAD_TIME_OUT = 1000;
     }
+    public static class HMDBConstants{
+        public static final String HMDB_RESOURCES = "dbclient/hmdb/";
+        public static final String HMDB_OUTPUT_FILE = "hmdb.sdf";
+        public static final String HMDB_MOLECULAR_WEIGHT = "MIMW";
+
+    }
 
     public static final class PubChemClient {
 
         public static final String REQUEST_URL = "https://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi";
         public static final String ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pccompound&usehistory=y&retmax=0&term=";
         public static final int ITEM_NUMBER = 0;
-        public static final String PUBCHEM_RESOURCES = "dbclient/pubchem/";
         public static final String PUBCHEM_DOWNLOAD_PAYLOAD_FILENAME = "download.xml";
+        public static final String PUBCHEM_RESOURCES = "dbclient/pubchem/";
+
+
         public static final String PUBCHEM_REQUEST_WebEnv_NAME = "WebEnv";
         public static final String PUBCHEM_REQUEST_RESULT_COUNT = "Count";
 
