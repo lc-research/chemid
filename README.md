@@ -1,3 +1,3 @@
-# chemid-structure
+# chemid
 
-ChemID Chemical Structure Service
+ChemID Chemical Structure Identification Platform
