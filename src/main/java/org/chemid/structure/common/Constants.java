@@ -12,24 +12,42 @@
 package org.chemid.structure.common;
 
 public class Constants {
+    public static final String DEFAULT_LOCATION = "D://";
+    public static final String ZIP_FILE_NAME = "yyyyMMddhhmm'.zip'";
+    public static final String LOCATION_SEPARATOR = "/";
 
     public static class ChemSpiderConstants {
         public static String TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
         public static Integer CONNECTION_TIMEOUT = 180000;
         public static Integer SO_TIME_OUT = 18000;
         public static Integer THREAD_TIME_OUT = 1000;
+        public static final String CHEMSPIDER_DB_NAME = "chemspider";
+        public static final String CHEM_SPIDER_TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
+        public static final Integer SERVICE_CONNECTION_TIME_OUT = 180000;
+        public static final Integer CONNECTION_TIME_OUT = 18000;
+        public static final String CHEM_SPIDER_RESULT_STATUS = "ResultReady";
+
     }
     public static class HMDBConstants{
         public static final String HMDB_RESOURCES = "dbclient/hmdb/";
         public static final String HMDB_OUTPUT_FILE = "hmdb.sdf";
         public static final String HMDB_MOLECULAR_WEIGHT = "MIMW";
+        public static final String HMDB_DB_NAME = "hmdb";
+        public static final String HMDB_SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
 
     }
 
     public static final class PubChemClient {
+        public static final String PUBCHEM_DB_NAME = "pubchem";
+        public static final String E_SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pccompound&usehistory=y&retmax=0&term=";
+        public static final String PUBCHEM_REQUEST_WEB_ENV_NAME = "WebEnv";
+        public static final String PUBCHEM_REQUEST_QUERY_KEY_NAME = "QueryKey";
+        public static final String PUB_CHEM_DOWNLOAD_PAYLOAD_FILE_NAME = "download.xml";
+        public static final String PUBCHEM_PAYLOAD_QUERY_KEY_NAME = "PCT-Entrez_query-key";
+        public static final String PUBCHEM_PAYLOAD_WEB_ENV_NAME = "PCT-Entrez_webenv";
+        public static final int PUBCHEM_THREAD_SLEEP_TIME = 1000;
 
         public static final String REQUEST_URL = "https://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi";
-        public static final String ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pccompound&usehistory=y&retmax=0&term=";
         public static final int ITEM_NUMBER = 0;
         public static final String PUBCHEM_DOWNLOAD_PAYLOAD_FILENAME = "download.xml";
         public static final String PUBCHEM_RESOURCES = "dbclient/pubchem/";
