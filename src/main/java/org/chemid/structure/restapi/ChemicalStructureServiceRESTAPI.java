@@ -16,16 +16,18 @@ import org.chemid.structure.common.Constants;
 import org.chemid.structure.dbclient.chemspider.ChemSpiderClient;
 import org.chemid.structure.dbclient.hmdb.HMDBClient;
 import org.chemid.structure.dbclient.hmdb.utilities.HMDBTools;
+import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.net.URL;
+import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.FileHandler;
 
 /**
@@ -33,7 +35,7 @@ import java.util.logging.FileHandler;
  */
 @Path("/rest/structure")
 public class ChemicalStructureServiceRESTAPI {
-    private static final Logger logger = LoggerFactory.getLogger(ChemicalStructureServiceRESTAPI.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChemicalStructureServiceRESTAPI.class);
     FileHandler fh;
 
     /**
@@ -48,50 +50,64 @@ public class ChemicalStructureServiceRESTAPI {
         return "Chemical Structure Service V 1.0";
     }
 
+    @POST
+    @Path("/searchdb")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public String createTrackInJSON(@FormParam("database") String database,
+                                    @FormParam("mass") String massString,
+                                    @FormParam("adduct") String adduct,
+                                    @FormParam("error") String errorString,
+                                    @FormParam("errorUnit") String errorUnit,
+                                    @FormParam("fileFormat") String fileFormat,
+                                    @FormParam("location") String location) {
 
-    @GET
-    @Path("{database}/{mass}/{adduct}/{error}/{errorUnit}/{fileFormat}")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getChemicalStructures(@PathParam("database") String database,
-                                        @PathParam("mass") Double mass,
-                                        @PathParam("adduct") String adduct,
-                                        @PathParam("error") Double error,
-                                        @PathParam("errorUnit") String errorUnit,
-                                        @PathParam("fileFormat") String fileFormat,
-                                        @QueryParam("location") String location) throws CatchException {
+        double mass = Double.parseDouble(massString);
+        double error = Double.parseDouble(errorString);
         String sdfPath = null;
         String loc = location;
+        String checkNull = "null";
         try {
             double searchMass = Tools.getSearchMass(mass, adduct);
-            error = Tools.getMassError(mass, error, errorUnit);
-            if (loc.trim().equals("null") || loc.trim().isEmpty() || loc.trim() == null) {
-                loc = "D://";
+            Double massError = Tools.getMassError(mass, error, errorUnit);
+            if (loc.trim().equals(checkNull) || loc.trim().isEmpty() || loc.trim() == null) {
+                loc = Constants.DEFAULT_LOCATION;
             } else {
                 loc = location;
             }
 
 
-            switch (database.toLowerCase().trim()) {
-                case "pubchem":
-                    String massRange = PubchemTools.getMassRange(searchMass, error);
-                    PubChemClient pubChemClient = new PubChemClient();
-                    String Url = pubChemClient.getDownloadURL(massRange);
-                    sdfPath = pubChemClient.saveFile(Url, loc.trim());
+            switch (database.toLowerCase(Locale.ENGLISH).trim()) {
+                case Constants.PubChemClient.PUBCHEM_DB_NAME:
+                    PubChemESearch pubChemESearch = new PubChemESearch();
+                    PubChemClient pubChemClient = new PubChemClient(pubChemESearch);
+                    String url = pubChemClient.getDownloadURL(PubchemTools.getMassRange(searchMass, massError));
+                    sdfPath = pubChemClient.saveFile(url, loc.trim());
+                    break;
+                case Constants.ChemSpiderConstants.CHEMSPIDER_DB_NAME:
+                    String token = Constants.ChemSpiderConstants.CHEM_SPIDER_TOKEN;
+                    ChemSpiderClient client = ChemSpiderClient.getInstance(token, true);
+                    sdfPath = client.getChemicalStructuresByMass(searchMass, massError, loc.trim());
+                    break;
+                case Constants.HMDBConstants.HMDB_DB_NAME:
 
-                case "chemspider":
-                    ChemSpiderClient client = ChemSpiderClient.getInstance(Constants.ChemSpiderConstants.TOKEN, true);
-                    sdfPath = client.getChemicalStructuresByMass(searchMass, error, loc.trim());
-
-                case "hmdb":
                     HMDBClient hmdbClient = new HMDBClient();
-                    sdfPath = hmdbClient.readSDF(HMDBTools.getLowerMassValue(searchMass,error),HMDBTools.getUpperMassValue(searchMass,error),loc.trim());
+                    double lowerVal = HMDBTools.getLowerMassValue(searchMass, massError);
+                    double upperVal = HMDBTools.getUpperMassValue(searchMass, error);
+                    sdfPath = hmdbClient.searchHMDB(lowerVal, upperVal, loc.trim());
+                    break;
+                default:
+                    sdfPath = null;
+                    break;
             }
-        } catch (Exception e) {
-            logger.error("Failed to retrieve data from databases : " + e);
+        } catch (ChemIDException | RuntimeException | IOException e) {
+            LOGGER.error("something going wrong.Failed to retrieve data from databases", e);
+
         }
-        if(sdfPath == null){
-            sdfPath = database.toLowerCase()+" not returning compounds for given mass range";
+        if (sdfPath == null) {
+            sdfPath = "0 compounds!";
         }
         return sdfPath;
+
     }
+
 }
