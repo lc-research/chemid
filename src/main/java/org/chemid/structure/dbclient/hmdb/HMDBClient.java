@@ -33,8 +33,8 @@ import java.util.stream.StreamSupport;
 public class HMDBClient {
 
 
-    boolean isInitial;
-    String savedPath;
+    private boolean isInitial;
+    private String savedPath;
     private SDFWriter writer;
     private IAtomContainer container;
     private FileInputStream inputStream;
@@ -130,16 +130,18 @@ public class HMDBClient {
     /**
      * @return
      */
-    public String getResourceDocument() {
+    private String getResourceDocument() {
 
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String hmdbRes = Constants.HMDBConstants.HMDB_RESOURCES;
         String outputFile = Constants.HMDBConstants.HMDB_OUTPUT_FILE;
         URL resource = classLoader.getResource(hmdbRes + outputFile);
 
-        return resource.getPath();
+        if (resource != null) {
+            return resource.getPath();
+        }
+        return Constants.HMDBConstants.FILE_NOT_FOUND;
     }
-
 
 
 }
