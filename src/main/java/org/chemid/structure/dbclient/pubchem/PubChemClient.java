@@ -1,4 +1,4 @@
-/*
+package org.chemid.structure.dbclient.pubchem;/*
  * Copyright (c) 2016, ChemID. (http://www.chemid.org)
  *
  * ChemID licenses this file to you under the Apache License V 2.0.
@@ -10,93 +10,107 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.chemid.structure.dbclient.pubchem;
+
+import org.apache.commons.io.FileUtils;
+import org.chemid.structure.common.Constants;
+import org.chemid.structure.common.RestClient;
+import org.chemid.structure.common.XmlParser;
+import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
+import org.chemid.structure.exception.ChemIDException;
+import org.glassfish.jersey.client.ClientConfig;
+import org.w3c.dom.Document;
 
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.io.FileUtils;
-import org.chemid.structure.dbclient.pubchem.beans.pubChemESearch;
-import org.chemid.structure.common.Constants;
-import org.chemid.structure.common.RestClient;
-import org.chemid.structure.common.XmlParser;
-import org.chemid.structure.exception.CatchException;
-import org.glassfish.jersey.client.ClientConfig;
-import org.w3c.dom.Document;
-
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
-
+/**
+ * pubchem client to download chemical structures from pubchem web services.
+ */
 public class PubChemClient {
 
-    private pubChemESearch pubChemESearch;
+    private PubChemESearch pubChemESearch;
     private RestClient restClient;
-
-    public pubChemESearch getPubChemESearchRequestParameters(String massRange) throws CatchException {
-        pubChemESearch = new pubChemESearch();
-
-        try {
-            this.restClient = new RestClient();
-            //Get request to http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pccompound&usehistory=y&retmax=0&term=100:100.01[exactmass]
-
-            Invocation.Builder invocationBuilder = restClient.getWebResource(Constants.PubChemClient.ESEARCH_URL + massRange).
-                    request(MediaType.APPLICATION_XML);
-            Response response = invocationBuilder.get();
-            String resp = response.readEntity(String.class);
-            Document doc = XmlParser.StringToXML(resp);
-            int count = Integer.parseInt(doc.getElementsByTagName(Constants.PubChemClient.PUBCHEM_REQUEST_RESULT_COUNT).item(Constants.PubChemClient.ITEM_NUMBER).
-                    getFirstChild().getNodeValue());
-            if (count > 0) {
-                pubChemESearch.setWebEnv(doc.getElementsByTagName(Constants.PubChemClient.PUBCHEM_REQUEST_WebEnv_NAME).
-                        item(Constants.PubChemClient.ITEM_NUMBER).
-                        getFirstChild().getNodeValue());
-                pubChemESearch.setQueryKey(doc.getElementsByTagName(Constants.PubChemClient.PUBCHEM_REQUEST_QueryKey_NAME).
-                        item(Constants.PubChemClient.ITEM_NUMBER).
-                        getFirstChild().getNodeValue());
-            } else {
-                pubChemESearch = null;
-            }
-        } catch (Exception e) {
-            throw new CatchException("Error occurred while getting PubChemESearch: " + e.getMessage());
-        }
-        return pubChemESearch;
+    /**
+     * constructor
+     *
+     * @param pubChemESearch
+     */
+    public PubChemClient(PubChemESearch pubChemESearch) {
+        this.pubChemESearch = pubChemESearch;
     }
 
-    public String getDownloadURL(String massRange) throws CatchException {
-        String downloadUrl = null;
-        try {
-            //set webEnv, querykey to eSearch
-            pubChemESearch = getPubChemESearchRequestParameters(massRange);
-            if (pubChemESearch != null) {
-                //create document with querykey and webenv
-                Document xmlPayload = XmlParser.getXMLPayload(Constants.PubChemClient.PUBCHEM_DOWNLOAD_PAYLOAD_FILENAME,
-                        Constants.PubChemClient.PUBCHEM_RESOURCES);
-                xmlPayload.getElementsByTagName(Constants.PubChemClient.PUBCHEM_PAYLOAD_QueryKey_NAME).
-                        item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(pubChemESearch.getQueryKey());
-                xmlPayload.getElementsByTagName(Constants.PubChemClient.PUBCHEM_PAYLOAD_WebEnv_NAME).
-                        item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(pubChemESearch.getWebEnv());
-                downloadUrl = pubQuery(XmlParser.getStringFromDocument(xmlPayload));
-            }
+    /**
+     * @param massRange
+     * @return pubchemEsearch object
+     * @throws ChemIDException
+     */
+    public PubChemESearch getPubChemESearchRequestParameters(String massRange) throws ChemIDException {
 
-        } catch (Exception e) {
+        this.restClient = new RestClient();
+        //Get request to
 
-            throw new CatchException("Error occurred while getting PubChem download URL: " + e.getMessage());
+        Invocation.Builder invocationBuilder = restClient.
+                getWebResource(Constants.PubChemClient.E_SEARCH_URL + massRange).
+                request(MediaType.APPLICATION_XML);
+        Response response = invocationBuilder.get();
+        String resp = response.readEntity(String.class);
+        Document doc = XmlParser.stringToXML(resp);
+        int count = Integer.parseInt(doc.getElementsByTagName(Constants.PubChemClient.PUBCHEM_REQUEST_RESULT_COUNT)
+                .item(Constants.PubChemClient.ITEM_NUMBER).
+                        getFirstChild().getNodeValue());
+        if (count > 0) {
+            pubChemESearch.setWebEnv(doc.getElementsByTagName(Constants.PubChemClient.
+                    PUBCHEM_REQUEST_WEB_ENV_NAME).
+                    item(Constants.PubChemClient.ITEM_NUMBER).
+                    getFirstChild().getNodeValue());
+            pubChemESearch.setQueryKey(doc.getElementsByTagName(Constants.PubChemClient
+                    .PUBCHEM_REQUEST_QUERY_KEY_NAME).
+                    item(Constants.PubChemClient.ITEM_NUMBER).
+                    getFirstChild().getNodeValue());
+        } else {
+            pubChemESearch = null;
         }
+        return pubChemESearch;
+
+    }
+
+
+    /**
+     * @param massRange
+     * @return url
+     * @throws ChemIDException
+     */
+    public String getDownloadURL(String massRange) throws ChemIDException {
+        String downloadUrl = null;
+        //set webEnv, querykey to eSearch
+        pubChemESearch = getPubChemESearchRequestParameters(massRange);
+        if (pubChemESearch != null) {
+            //create document with querykey and webenv
+            String xmlFile = Constants.PubChemClient.PUB_CHEM_DOWNLOAD_PAYLOAD_FILE_NAME;
+            String resource = Constants.PubChemClient.PUBCHEM_RESOURCES;
+            Document xmlPayload = XmlParser.getXMLPayload(xmlFile, resource);
+            xmlPayload.getElementsByTagName(Constants.PubChemClient.PUBCHEM_PAYLOAD_QUERY_KEY_NAME).
+                    item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(pubChemESearch.getQueryKey());
+            xmlPayload.getElementsByTagName(Constants.PubChemClient.PUBCHEM_PAYLOAD_WEB_ENV_NAME).
+                    item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(pubChemESearch.getWebEnv());
+            downloadUrl = pubQuery(XmlParser.getStringFromDocument(xmlPayload));
+        }
+
+
         return downloadUrl;
     }
 
-    public String pubQuery(String xmlPayload) throws CatchException {
+    /**
+     * @param xmlPayload
+     * @return url of sdf file
+     * @throws ChemIDException
+     */
+    public String pubQuery(String xmlPayload) throws ChemIDException {
         String pubQuery = null;
         try {
             //post request with query key, webenv
@@ -111,68 +125,75 @@ public class PubChemClient {
 
             while (resp.contains(Constants.PubChemClient.PUG_QUERY_QUEUED_STATUS_TAG_NAME) ||
                     resp.contains(Constants.PubChemClient.PUG_QUERY_RUNNING_STATUS_TAG_NAME)) {
-                Thread.sleep(1000);
+                Thread.sleep(Constants.PubChemClient.PUBCHEM_THREAD_SLEEP_TIME);
                 if (resp.contains(Constants.PubChemClient.CHECK_QUERY_WAITING_REQUEST_ID_TAG)) {
                     // request with equest id
-                    resp = checkQuery(XmlParser.StringToXML(resp).getElementsByTagName(Constants.PubChemClient.
+                    resp = checkQuery(XmlParser.stringToXML(resp).getElementsByTagName(Constants.PubChemClient.
                             CHECK_QUERY_WAITING_REQUEST_ID_TAG_NAME).item(Constants.PubChemClient.ITEM_NUMBER).
                             getFirstChild().getNodeValue());
                 }
             }
             // url of sdf file
-            pubQuery = XmlParser.StringToXML(resp).getElementsByTagName(Constants.PubChemClient.PUG_QUERY_SDF_DOWNLOAD_URL).
-                    item(Constants.PubChemClient.ITEM_NUMBER).getFirstChild().getNodeValue();
+            String getUrl = Constants.PubChemClient.PUG_QUERY_SDF_DOWNLOAD_URL;
+            int item = Constants.PubChemClient.ITEM_NUMBER;
+            pubQuery = XmlParser.stringToXML(resp).getElementsByTagName(getUrl).
+                    item(item).getFirstChild().getNodeValue();
 
-        } catch (Exception e) {
-            new CatchException("Error occurred while getting PubChem query: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ChemIDException("Error occurred while downloading chemspider downloadCompressedSDF: ", e);
         }
         return pubQuery;
     }
 
-    public String checkQuery(String requestID) throws CatchException {
-        String res = null;
-        try {
-            Document xmlPayload = XmlParser.getXMLPayload(Constants.PubChemClient.CHECK_QUERY_FILE_NAME,
-                    Constants.PubChemClient.PUBCHEM_RESOURCES);
-            xmlPayload.getElementsByTagName(Constants.PubChemClient.CHECK_QUERY_REQUEST_ID_TAG_NAME).
-                    item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(requestID);
-            ClientConfig config = new ClientConfig();
+    /**
+     * @param requestID
+     * @return verified url of sdf file
+     * @throws ChemIDException
+     */
+    public String checkQuery(String requestID) throws ChemIDException {
+        Document xmlPayload = null;
+        xmlPayload = XmlParser.getXMLPayload(Constants.PubChemClient.CHECK_QUERY_FILE_NAME,
+                Constants.PubChemClient.PUBCHEM_RESOURCES);
 
-            Client client = ClientBuilder.newClient(config);
+        xmlPayload.getElementsByTagName(Constants.PubChemClient.CHECK_QUERY_REQUEST_ID_TAG_NAME).
+                item(Constants.PubChemClient.ITEM_NUMBER).setTextContent(requestID);
+        ClientConfig config = new ClientConfig();
 
-            WebTarget target = client.target(Constants.PubChemClient.REQUEST_URL);
+        Client client = ClientBuilder.newClient(config);
 
-            Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_XML);
-            Response response = invocationBuilder.post(Entity.entity(xmlPayload, MediaType.TEXT_PLAIN));
-            res = response.readEntity(String.class);
+        WebTarget target = client.target(Constants.PubChemClient.REQUEST_URL);
 
-        } catch (Exception e) {
-            new CatchException("Error occurred while checking PubChem query: " + e.getMessage());
-        }
-        return res;
+        Invocation.Builder invocationBuilder = target.request(MediaType.APPLICATION_XML);
+        Response response = invocationBuilder.post(Entity.entity(xmlPayload, MediaType.TEXT_PLAIN));
+        return response.readEntity(String.class);
     }
 
-    public String saveFile(String Url, String location) throws CatchException {
-        URL url = null;
+    /**
+     * @param fileUrl
+     * @param location
+     * @return sdf file saved location with file name
+     * @throws ChemIDException
+     */
+    public String saveFile(String fileUrl, String location) throws ChemIDException {
         String savedPath = null;
-        if (Url != null) {
+        if (fileUrl != null) {
             try {
-                url = new URL(Url);
+                URL url = new URL(fileUrl);
                 File dir = new File(location);
                 dir.mkdirs();
-                String fileName = new SimpleDateFormat("yyyyMMddhhmm'.zip'").format(new Date());
+                String fileName = new SimpleDateFormat(Constants.ZIP_FILE_NAME).format(new Date());
                 File tmp = new File(dir, fileName);
                 tmp.createNewFile();
                 FileUtils.copyURLToFile(url, tmp);
-                savedPath = "";
                 if (location.endsWith("/")) {
                     savedPath = location + fileName;
 
                 } else {
                     savedPath = location + '/' + fileName;
                 }
-            } catch (Exception e) {
-                new CatchException("Error occurred while saving PubChem results file : " + e.getMessage());
+            } catch (IOException e) {
+                throw new ChemIDException("Error occurred while saving PubChem results file : ", e);
 
             }
         }
