@@ -101,11 +101,11 @@ public class ChemicalStructureServiceRESTAPI {
                     break;
             }
         } catch (ChemIDException | RuntimeException | IOException e) {
-            LOGGER.error("something going wrong.Failed to retrieve data from databases", e);
+            LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG, e);
 
         }
         if (sdfPath == null) {
-            sdfPath = "0 compounds!";
+            sdfPath = Constants.NO_COMPOUNDS;
         }
         return sdfPath;
 
@@ -122,14 +122,20 @@ public class ChemicalStructureServiceRESTAPI {
             @FormParam("keep_compounds") String keepCompounds,
             @FormParam("compound_must_contain") String mustContain,
             @FormParam("eliminate_overall_charges") boolean eliminateCharges,
-            @FormParam("keep_positive_charges") boolean keepPositiveCharges) throws ChemIDException, IOException {
+            @FormParam("keep_positive_charges") boolean keepPositiveCharges) {
         String savedPath = null;
-        if (inputFilePath == "" || inputFilePath == null) {
-            savedPath = Constants.PreFilterConstants.FILE_PATH_EMPTY;
-        } else {
-            CleanUpStructures preFilter = new CleanUpStructures(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
-            savedPath = preFilter.FilterStructures();
+        try {
+            if (inputFilePath == "" || inputFilePath == null) {
+                savedPath = Constants.PreFilterConstants.FILE_PATH_EMPTY;
+            } else {
+                CleanUpStructures preFilter = new CleanUpStructures(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
+                savedPath = preFilter.FilterStructures();
+            }
+        } catch (ChemIDException | RuntimeException | IOException e) {
+            LOGGER.error(Constants.PreFilterConstants.ZERO_COMPOUNDS_ERROR_LOG_PREFILTER, e);
+
         }
+
         return savedPath;
 
 
