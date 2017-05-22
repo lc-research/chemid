@@ -11,7 +11,7 @@
  */
 package org.chemid.structure.common;
 
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,46 +31,57 @@ import java.io.StringWriter;
 import java.net.URL;
 
 public class XmlParser {
-
-
-    public static Document StringToXML(String xmlRecords) throws CatchException {
+    /**
+     * @param xmlRecords
+     * @return doc :Document
+     */
+    public static Document stringToXML(String xmlRecords) throws ChemIDException {
 
         DocumentBuilder db = null;
         Document doc = null;
         try {
             db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
             InputSource is = new InputSource();
             is.setCharacterStream(new StringReader(xmlRecords));
 
             doc = db.parse(is);
-        } catch (Exception e) {
-            throw new CatchException("Error occurred in xml Parser StringToXML : " + e.getMessage());
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new ChemIDException("Error occurred in xml Parser StringToXML : ", e);
         }
 
         return doc;
     }
 
-    public static Document getXMLPayload(String fileName, String location) throws CatchException {
+
+    /**
+     * @param fileName
+     * @param location
+     * @return doc :Document
+     */
+    public static Document getXMLPayload(String fileName, String location) throws ChemIDException {
         Document doc = null;
-//        URL url = Thread.currentThread().getContextClassLoader().getResource(location + fileName);
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
             URL resource = classLoader.getResource(location + fileName);
-
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = null;
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-            dBuilder = dbFactory.newDocumentBuilder();
             doc = dBuilder.parse(new File(resource.getPath()));
+        } catch (SAXException | IOException | ParserConfigurationException e) {
 
-        } catch (Exception e) {
-            throw new CatchException("Error occurred in xml Parser getXMLPayload : " + e.getMessage());
+            throw new ChemIDException("Error occurred in xml Parser getXMLPayload : ", e);
         }
+
+
         return doc;
     }
 
-    public static String getStringFromDocument(Document doc) throws CatchException {
+    /**
+     * @param doc: Document
+     * @return output : String content of document
+     */
+    public static String getStringFromDocument(Document doc) throws ChemIDException {
         String output = null;
         try {
             DOMSource domSource = new DOMSource(doc);
@@ -80,9 +91,13 @@ public class XmlParser {
             Transformer transformer = tf.newTransformer();
             transformer.transform(domSource, result);
             output = writer.toString();
-        } catch (Exception ex) {
-            throw new CatchException("Error occurred in xml Parser getStringFromDocument : " + ex.getMessage());
+
+        } catch (TransformerException e) {
+
+            throw new ChemIDException("Error occurred in xml Parser getStringFromDocument : ", e);
+
         }
+
         return output;
     }
 }
