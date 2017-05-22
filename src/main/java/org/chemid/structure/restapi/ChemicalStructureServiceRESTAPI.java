@@ -16,11 +16,12 @@ import org.chemid.structure.common.Constants;
 import org.chemid.structure.dbclient.chemspider.ChemSpiderClient;
 import org.chemid.structure.dbclient.hmdb.HMDBClient;
 import org.chemid.structure.dbclient.hmdb.utilities.HMDBTools;
-import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
+import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
 import org.chemid.structure.exception.ChemIDException;
+import org.chemid.structure.preFilters.CleanUpStructures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,5 +110,30 @@ public class ChemicalStructureServiceRESTAPI {
         return sdfPath;
 
     }
+
+    @POST
+    @Path("doFilters")
+    @Produces(MediaType.TEXT_HTML)
+    public String removeIrrelevantStructures(
+            @FormParam("input_file_path") String inputFilePath,
+            @FormParam("remove_disconnected_structures") boolean removeDisconnected,
+            @FormParam("remove_heavy_isotopes") boolean removeHeavyIsotopes,
+            @FormParam("remove_stereoisomers") boolean removeStereoisomers,
+            @FormParam("keep_compounds") String keepCompounds,
+            @FormParam("compound_must_contain") String mustContain,
+            @FormParam("eliminate_overall_charges") boolean eliminateCharges,
+            @FormParam("keep_positive_charges") boolean keepPositiveCharges) throws ChemIDException, IOException {
+        String savedPath = null;
+        if (inputFilePath == "" || inputFilePath == null) {
+            savedPath = Constants.PreFilterConstants.FILE_PATH_EMPTY;
+        } else {
+            CleanUpStructures preFilter = new CleanUpStructures(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
+            savedPath = preFilter.FilterStructures();
+        }
+        return savedPath;
+
+
+    }
+
 
 }
