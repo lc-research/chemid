@@ -16,7 +16,8 @@ public class Constants {
     public static final String ZIP_FILE_NAME = "yyyyMMddhhmm'.zip'";
     public static final String LOCATION_SEPARATOR = "/";
     public static final String SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
-
+public static final String ZERO_COMPOUNDS_ERROR_LOG = "something going wrong.Failed to retrieve data from databases";
+public static final String NO_COMPOUNDS = "0 compounds!";
     public static class ChemSpiderConstants {
         public static final String CHEMSPIDER_DB_NAME = "chemspider";
         public static final String CHEM_SPIDER_TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
@@ -71,6 +72,7 @@ public class Constants {
         public static final String FILE_PATH_EMPTY = "Please specify file path";
         public static final String GENERATED_SMILE = "GENERATED_SMILE";
         public static final String EMPTY_MSG = "0 Compounds for given filters";
+        public static final String ZERO_COMPOUNDS_ERROR_LOG_PREFILTER = "something going wrong.No compounds according to the filters";
 
 
     }
