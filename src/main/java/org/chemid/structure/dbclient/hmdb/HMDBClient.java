@@ -13,8 +13,9 @@
 package org.chemid.structure.dbclient.hmdb;
 
 import org.chemid.structure.common.Constants;
-import org.chemid.structure.exception.CatchException;
+import org.chemid.structure.exception.ChemIDException;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
@@ -22,6 +23,7 @@ import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,79 +33,113 @@ import java.util.stream.StreamSupport;
 public class HMDBClient {
 
 
-    private SDFWriter writer;
-    private IAtomContainer container;
     boolean isInitial;
     String savedPath;
+    private SDFWriter writer;
+    private IAtomContainer container;
+    private FileInputStream inputStream;
 
-    public String readSDF(double lowerMassValue, double upperMassValue, String location) throws CatchException {
-        savedPath = null;
-        isInitial = true;
-        Stream<IAtomContainer> stream = null;
-        String doc = null;
-        doc = getResourceDocument();
-        File sdfFile = new File(doc);
-        try {
-            IteratingSDFReader finalReader = new IteratingSDFReader(
-                    new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
-            Iterable<IAtomContainer> iterables = () -> finalReader;
-            StreamSupport.stream(iterables.spliterator(), true)
-                    .filter(mol -> {
-                        return (Double.parseDouble(mol.getProperty(Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT)) > lowerMassValue && Double.parseDouble(mol.getProperty(Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT)) < upperMassValue);
-                    })
-                    .forEach((m) -> {
-                        try {
-                            if (isInitial) {
-                                isInitial = false;
-                                savedPath = createFile(location);
-                            }
-                            IAtomContainer container = m;
-                            writer.write(container);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            new CatchException("Error occurred while writing results: " + e.getMessage());
-                        }
-                    });
-            if (writer != null) {
-                writer.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            new CatchException("Error occurred while downloading hmdb: " + e.getMessage());
-        }
+    /**
+     * @param lowerMassValue
+     * @param upperMassValue
+     * @param location
+     * @return sdf file saved location
+     * @throws ChemIDException
+     */
+    public String searchHMDB(double lowerMassValue, double upperMassValue, String location) throws ChemIDException, IOException {
+
+        createFile(location);
+
+        String molWeight = Constants.HMDBConstants.HMDB_MOLECULAR_WEIGHT;
+
+        Iterable<IAtomContainer> iterables;
+
+        iterables = getIterables();
+
+
+        Stream<IAtomContainer> stream = StreamSupport.stream(iterables.spliterator(), true)
+                .filter(mol -> {
+                    double mimw = Double.parseDouble(mol.getProperty(molWeight));
+                    return mimw > lowerMassValue && mimw < upperMassValue;
+                });
+        writeOutputSDFFile(stream, location);
+
+
         return savedPath;
     }
 
-    private String createFile(String location) {
-        String savedPath;
-        String outputName = new SimpleDateFormat("yyyyMMddhhmm'.sdf'").format(new Date());
-        if (location.endsWith("/")) {
+    /**
+     * @param stream
+     * @param location
+     */
+    private void writeOutputSDFFile(Stream<IAtomContainer> stream, String location) {
+
+        stream.forEach(m -> {
+            try {
+                if (isInitial) {
+                    createFile(location);
+                }
+                writer.write(m);
+            } catch (CDKException | RuntimeException | IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+    }
+
+    /**
+     * @param location
+     * @throws IOException
+     */
+    private void createFile(String location) throws IOException {
+        isInitial = false;
+        String outputName = new SimpleDateFormat(Constants.HMDBConstants.HMDB_SDF_FILE_NAME).format(new Date());
+        if (location.endsWith(Constants.LOCATION_SEPARATOR)) {
             savedPath = location + outputName;
         } else {
-            savedPath = location + '/' + outputName;
+            savedPath = location + Constants.LOCATION_SEPARATOR + outputName;
         }
         File output = new File(savedPath);
-        try {
-            writer = new SDFWriter(new FileWriter(output));
-        } catch (Exception e) {
-            e.printStackTrace();
-            new CatchException("Error occurred while creating hmdb file: " + e.getMessage());
-        }
-        return savedPath;
+        FileWriter fileWriter = new FileWriter(output);
+        writer = new SDFWriter(fileWriter);
+
     }
 
+    /**
+     * @return
+     * @throws ChemIDException
+     */
+    private Iterable<IAtomContainer> getIterables() throws ChemIDException {
+        String doc = getResourceDocument();
+        File sdfFile = new File(doc);
+        Iterable<IAtomContainer> iterables;
 
-    public String getResourceDocument() throws CatchException {
-        String docPath = null;
         try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            URL resource = classLoader.getResource(Constants.HMDBConstants.HMDB_RESOURCES + Constants.HMDBConstants.HMDB_OUTPUT_FILE);
-            docPath = resource.getPath();
-        } catch (Exception e) {
-            new CatchException("Error occurred while loading Resource File: " + e.getMessage());
+            inputStream = new FileInputStream(sdfFile);
+
+            IteratingSDFReader finalReader = new IteratingSDFReader(
+                    inputStream, DefaultChemObjectBuilder.getInstance());
+            iterables = () -> finalReader;
+        } catch (IOException e) {
+            throw new ChemIDException("Error occurred while reading file: ", e);
         }
-        return docPath;
+
+        return iterables;
     }
+
+    /**
+     * @return
+     */
+    public String getResourceDocument() {
+
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        String hmdbRes = Constants.HMDBConstants.HMDB_RESOURCES;
+        String outputFile = Constants.HMDBConstants.HMDB_OUTPUT_FILE;
+        URL resource = classLoader.getResource(hmdbRes + outputFile);
+
+        return resource.getPath();
+    }
+
 
 
 }
