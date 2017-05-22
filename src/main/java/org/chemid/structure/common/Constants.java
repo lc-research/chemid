@@ -18,26 +18,27 @@ public class Constants {
     public static final String SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
 
     public static class ChemSpiderConstants {
-        public static String TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
-        public static Integer CONNECTION_TIMEOUT = 180000;
-        public static Integer SO_TIME_OUT = 18000;
-        public static Integer THREAD_TIME_OUT = 1000;
         public static final String CHEMSPIDER_DB_NAME = "chemspider";
         public static final String CHEM_SPIDER_TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
         public static final Integer SERVICE_CONNECTION_TIME_OUT = 180000;
         public static final Integer CONNECTION_TIME_OUT = 18000;
         public static final String CHEM_SPIDER_RESULT_STATUS = "ResultReady";
         public static final String CHEMSPIDER_CSID = "CSID";
+        public static String TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
+        public static Integer CONNECTION_TIMEOUT = 180000;
+        public static Integer SO_TIME_OUT = 18000;
+        public static Integer THREAD_TIME_OUT = 1000;
 
 
     }
-    public static class HMDBConstants{
+
+    public static class HMDBConstants {
         public static final String HMDB_RESOURCES = "dbclient/hmdb/";
         public static final String HMDB_OUTPUT_FILE = "hmdb.sdf";
         public static final String HMDB_MOLECULAR_WEIGHT = "MIMW";
         public static final String HMDB_DB_NAME = "hmdb";
         public static final String HMDB_ID = "ID";
-
+        public static final String FILE_NOT_FOUND = "Resource file not found!";
     }
 
     public static final class PubChemClient {
@@ -64,7 +65,8 @@ public class Constants {
         public static final String PUBCHEM_COMPOUND_CID = "PUBCHEM_COMPOUND_CID";
 
     }
-    public static class PreFilterConstants{
+
+    public static class PreFilterConstants {
         public static final String FILE_NOT_FOUND = "File does not exist in given location";
         public static final String FILE_PATH_EMPTY = "Please specify file path";
         public static final String GENERATED_SMILE = "GENERATED_SMILE";
