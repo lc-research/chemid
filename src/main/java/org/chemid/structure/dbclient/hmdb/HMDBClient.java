@@ -93,7 +93,7 @@ public class HMDBClient {
      */
     private void createFile(String location) throws IOException {
         isInitial = false;
-        String outputName = new SimpleDateFormat(Constants.HMDBConstants.HMDB_SDF_FILE_NAME).format(new Date());
+        String outputName = new SimpleDateFormat(Constants.SDF_FILE_NAME).format(new Date());
         if (location.endsWith(Constants.LOCATION_SEPARATOR)) {
             savedPath = location + outputName;
         } else {
