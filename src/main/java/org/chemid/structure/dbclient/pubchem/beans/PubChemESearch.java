@@ -1,3 +1,5 @@
+package org.chemid.structure.dbclient.pubchem.beans;
+
 /*
  * Copyright (c) 2016, ChemID. (http://www.chemid.org)
  *
@@ -9,12 +11,7 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-
-package org.chemid.structure.dbclient.pubchem.beans;
-
-
-public class pubChemESearch {
-
+public class PubChemESearch {
     private String WebEnv;
     protected String QueryKey;
 
@@ -34,3 +31,5 @@ public class pubChemESearch {
         this.QueryKey = queryKey;
     }
 }
+
+
