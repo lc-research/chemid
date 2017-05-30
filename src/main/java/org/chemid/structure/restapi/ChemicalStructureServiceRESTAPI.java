@@ -20,8 +20,7 @@ import org.chemid.structure.dbclient.pubchem.PubChemClient;
 import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
-import org.chemid.structure.exception.ChemIDException;
-import org.chemid.structure.preFilters.CleanUpStructures;
+import org.chemid.structure.exception.ChemIDStructureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.logging.FileHandler;
 
 /**
  * This class includes RESTful API methods for chemical structure service.
@@ -37,7 +35,6 @@ import java.util.logging.FileHandler;
 @Path("/rest/structure")
 public class ChemicalStructureServiceRESTAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChemicalStructureServiceRESTAPI.class);
-    FileHandler fh;
 
     /**
      * This method returns the version number of the chemical structure service.
@@ -100,7 +97,7 @@ public class ChemicalStructureServiceRESTAPI {
                     sdfPath = null;
                     break;
             }
-        } catch (ChemIDException | RuntimeException | IOException e) {
+        } catch (ChemIDStructureException | RuntimeException | IOException e) {
             LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG, e);
 
         }
@@ -111,35 +108,7 @@ public class ChemicalStructureServiceRESTAPI {
 
     }
 
-    @POST
-    @Path("doFilters")
-    @Produces(MediaType.TEXT_HTML)
-    public String removeIrrelevantStructures(
-            @FormParam("input_file_path") String inputFilePath,
-            @FormParam("remove_disconnected_structures") boolean removeDisconnected,
-            @FormParam("remove_heavy_isotopes") boolean removeHeavyIsotopes,
-            @FormParam("remove_stereoisomers") boolean removeStereoisomers,
-            @FormParam("keep_compounds") String keepCompounds,
-            @FormParam("compound_must_contain") String mustContain,
-            @FormParam("eliminate_overall_charges") boolean eliminateCharges,
-            @FormParam("keep_positive_charges") boolean keepPositiveCharges) {
-        String savedPath = null;
-        try {
-            if (inputFilePath == "" || inputFilePath == null) {
-                savedPath = Constants.PreFilterConstants.FILE_PATH_EMPTY;
-            } else {
-                CleanUpStructures preFilter = new CleanUpStructures(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
-                savedPath = preFilter.FilterStructures();
-            }
-        } catch (ChemIDException | RuntimeException | IOException e) {
-            LOGGER.error(Constants.PreFilterConstants.ZERO_COMPOUNDS_ERROR_LOG_PREFILTER, e);
 
-        }
-
-        return savedPath;
-
-
-    }
 
 
 }
