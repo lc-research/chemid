@@ -9,10 +9,10 @@
  * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.chemid.structure.preFilters;
+package org.chemid.prefilter.applyFilters;
 
-import org.chemid.structure.common.Constants;
-import org.chemid.structure.exception.ChemIDException;
+import org.chemid.prefilter.common.Constants;
+import org.chemid.prefilter.exception.ChemIDPreFilterException;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -35,7 +35,7 @@ import java.util.stream.StreamSupport;
 
 
 public class CleanUpStructures {
-    private String inputFilePath, keepCompounds, mustContain,savedPath;
+    private String inputFilePath, keepCompounds, mustContain, savedPath;
     private SDFWriter writer;
     private boolean flag = true;
     private int k = 0;
@@ -68,12 +68,12 @@ public class CleanUpStructures {
         }
     }
 
-    public String FilterStructures() throws ChemIDException, IOException {
-        int index = inputFilePath.lastIndexOf('/');
+    public String FilterStructures() throws ChemIDPreFilterException, IOException {
+        int index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR);
         createFile(inputFilePath.substring(0, index));
         File sdfFile = new File(inputFilePath);
         if (!sdfFile.exists()) {
-            savedPath = Constants.PreFilterConstants.FILE_NOT_FOUND;
+            savedPath = Constants.FILE_NOT_FOUND;
         } else {
             Iterable<IAtomContainer> iterable = getIterables(sdfFile);
             Stream<IAtomContainer> stream = StreamSupport.stream(iterable.spliterator(), true).filter(mol -> {
@@ -128,15 +128,15 @@ public class CleanUpStructures {
                     } else {
                         flag = true;
                     }
-                } catch (ChemIDException e) {
-                    throw new RuntimeException(e);
+                } catch (ChemIDPreFilterException e) {
+                    e.printStackTrace();
                 }
                 return flag;
             });
             writeToFile(stream);
 
             if (k == 0) {
-                savedPath = Constants.PreFilterConstants.EMPTY_MSG;
+                savedPath = Constants.EMPTY_MSG;
             }
         }
         return savedPath;
@@ -176,8 +176,8 @@ public class CleanUpStructures {
 
     private boolean removeHeavyIsotopes(IAtomContainer mol, boolean removeHeavyIsotopes) {
         if (removeHeavyIsotopes) {
-            if (mol.getProperty(Constants.PubChemClient.PUBCHEM_ISOTOPIC_ATOM_COUNT) != null) {
-                if (Integer.parseInt(mol.getProperty(Constants.PubChemClient.PUBCHEM_ISOTOPIC_ATOM_COUNT).toString()) > 0) {
+            if (mol.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT) != null) {
+                if (Integer.parseInt(mol.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT).toString()) > 0) {
                     return false;
                 }
             } else {
@@ -226,8 +226,7 @@ public class CleanUpStructures {
             }
         }
         if (atomList1.size() > 0) {
-            boolean sameList = getEqualLists(compoundsMustContain, atomList1);
-            return sameList;
+            return getEqualLists(compoundsMustContain, atomList1);
         } else {
             return false;
         }
@@ -236,7 +235,7 @@ public class CleanUpStructures {
     private boolean getEqualLists(List<String> list1, List<String> list2) {
         if (list1 == null && list2 == null)
             return false;
-        if (list1 == null || list1 != null && list2 == null)
+        if (list2 == null)
             return false;
 
         for (String itemList1 : list1) {
@@ -246,20 +245,20 @@ public class CleanUpStructures {
         return true;
     }
 
-    private boolean removeStereoisomers(IAtomContainer mol, boolean removeStereoisomers) throws ChemIDException {
+    private boolean removeStereoisomers(IAtomContainer mol, boolean removeStereoisomers) throws ChemIDPreFilterException {
         String smile = createSmile(mol);
 
-        mol.setProperty(Constants.PreFilterConstants.GENERATED_SMILE, smile);
+        mol.setProperty(Constants.GENERATED_SMILE, smile);
         if (removeStereoisomers) if (map != null) {
             if (map.containsKey(smile)) {
                 return false;
             } else {
-                if (mol.getProperty(Constants.PubChemClient.PUBCHEM_COMPOUND_CID) != null) {
-                    map.put(smile, mol.getProperty(Constants.PubChemClient.PUBCHEM_COMPOUND_CID));
-                } else if (mol.getProperty(Constants.ChemSpiderConstants.CHEMSPIDER_CSID) != null) {
-                    map.put(smile, mol.getProperty(Constants.ChemSpiderConstants.CHEMSPIDER_CSID));
-                } else if (mol.getProperty(Constants.HMDBConstants.HMDB_ID) != null) {
-                    map.put(smile, mol.getProperty(Constants.HMDBConstants.HMDB_ID));
+                if (mol.getProperty(Constants.PUBCHEM_COMPOUND_CID) != null) {
+                    map.put(smile, mol.getProperty(Constants.PUBCHEM_COMPOUND_CID));
+                } else if (mol.getProperty(Constants.CHEMSPIDER_CSID) != null) {
+                    map.put(smile, mol.getProperty(Constants.CHEMSPIDER_CSID));
+                } else if (mol.getProperty(Constants.HMDB_ID) != null) {
+                    map.put(smile, mol.getProperty(Constants.HMDB_ID));
                 }
                 return true;
             }
@@ -270,13 +269,13 @@ public class CleanUpStructures {
         return true;
     }
 
-    private String createSmile(IAtomContainer mol) throws ChemIDException {
+    private String createSmile(IAtomContainer mol) throws ChemIDPreFilterException {
         SmilesGenerator smileGen = SmilesGenerator.unique();
         String smile;
         try {
             smile = smileGen.create(mol);
         } catch (CDKException e) {
-            throw new ChemIDException(e.getMessage(), e);
+            throw new ChemIDPreFilterException(e.getMessage(), e);
         }
         return smile;
     }
