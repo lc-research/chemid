@@ -63,17 +63,8 @@ public static final String NO_COMPOUNDS = "0 compounds!";
         public static final String PUG_QUERY_QUEUED_STATUS_TAG_NAME = "<PCT-Status value=\"queued\"/>";
         public static final String PUG_QUERY_RUNNING_STATUS_TAG_NAME = "<PCT-Status value=\"running\"/>";
         public static final String PUG_QUERY_SDF_DOWNLOAD_URL = "PCT-Download-URL_url";
-        public static final String PUBCHEM_COMPOUND_CID = "PUBCHEM_COMPOUND_CID";
 
     }
 
-    public static class PreFilterConstants {
-        public static final String FILE_NOT_FOUND = "File does not exist in given location";
-        public static final String FILE_PATH_EMPTY = "Please specify file path";
-        public static final String GENERATED_SMILE = "GENERATED_SMILE";
-        public static final String EMPTY_MSG = "0 Compounds for given filters";
-        public static final String ZERO_COMPOUNDS_ERROR_LOG_PREFILTER = "something going wrong.No compounds according to the filters";
 
-
-    }
 }

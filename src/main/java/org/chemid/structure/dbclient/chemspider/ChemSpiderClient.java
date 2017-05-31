@@ -21,7 +21,7 @@ import org.chemid.structure.dbclient.chemspider.generated.SearchStub;
 import org.chemid.structure.dbclient.chemspider.generated.SearchStub.AsyncSimpleSearch;
 import org.chemid.structure.dbclient.chemspider.generated.SearchStub.GetAsyncSearchResultResponse;
 import org.chemid.structure.dbclient.chemspider.generated.SearchStub.GetAsyncSearchStatusResponse;
-import org.chemid.structure.exception.ChemIDException;
+import org.chemid.structure.exception.ChemIDStructureException;
 import org.openscience.cdk.ChemFile;
 import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.exception.CDKException;
@@ -74,7 +74,7 @@ public class ChemSpiderClient {
      * @param token : Security token
      * @return
      */
-    public static String getSearchGetAsyncSearchStatusResults(String rid, String token) throws ChemIDException {
+    public static String getSearchGetAsyncSearchStatusResults(String rid, String token) throws ChemIDStructureException {
         String output = null;
         final SearchStub thisSearchStub;
         try {
@@ -89,7 +89,7 @@ public class ChemSpiderClient {
                     thisSearchStub.getAsyncSearchStatus(getAsyncSearchStatusInput);
             output = thisGetAsyncSearchStatusResponse.getGetAsyncSearchStatusResult().toString();
         } catch (RemoteException e) {
-            throw new ChemIDException("Error occurred while downloading chemspider :", e);
+            throw new ChemIDStructureException("Error occurred while downloading chemspider :", e);
         }
         return output;
     }
@@ -98,9 +98,9 @@ public class ChemSpiderClient {
      * @param dh
      * @param location
      * @return savedpath
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    private static String saveFile(DataHandler dh, String location) throws ChemIDException {
+    private static String saveFile(DataHandler dh, String location) throws ChemIDStructureException {
         String savedFile = null;
         InputStream is = null;
         try {
@@ -122,7 +122,7 @@ public class ChemSpiderClient {
                 savedFile = location + Constants.LOCATION_SEPARATOR + fileName;
             }
         } catch (IOException e) {
-            throw new ChemIDException("error occured while saving chemspider sdf file to the location", e);
+            throw new ChemIDStructureException("error occured while saving chemspider sdf file to the location", e);
 
         }
         return savedFile;
@@ -135,9 +135,9 @@ public class ChemSpiderClient {
      * @param error    : Instrumentation error.
      * @param location : location where file to be save
      * @return The string containing the list of CSID values of resultant molecules.
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String getChemicalStructuresByMass(Double mass, Double error, String location) throws ChemIDException {
+    public String getChemicalStructuresByMass(Double mass, Double error, String location) throws ChemIDStructureException {
         String sdfPath = null;
         String timeOut = HTTPConstants.CONNECTION_TIMEOUT;
 
@@ -177,7 +177,7 @@ public class ChemSpiderClient {
 
             return sdfPath;
         } catch (RemoteException e) {
-            throw new ChemIDException("Error occurred while downloading chemspider results: ", e);
+            throw new ChemIDStructureException("Error occurred while downloading chemspider results: ", e);
         }
     }
 
@@ -188,9 +188,9 @@ public class ChemSpiderClient {
      * @param csidsList : CSID of a molecule
      * @param location  : location of file to be save
      * @return : String containing the molecules in sdf format.
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String getChemicalStructuresByCsids(int[] csidsList, String location) throws ChemIDException {
+    public String getChemicalStructuresByCsids(int[] csidsList, String location) throws ChemIDStructureException {
         String sdfPath = null;
         List<IAtomContainer> cons = new ArrayList<>();
         String timeOut = HTTPConstants.CONNECTION_TIMEOUT;
@@ -228,7 +228,7 @@ public class ChemSpiderClient {
 
             return sdfPath;
         } catch (RemoteException e) {
-            throw new ChemIDException("Error occurred while downloading chemspider getChemicalStructuresByCsids: ", e);
+            throw new ChemIDStructureException("Error occurred while downloading chemspider getChemicalStructuresByCsids: ", e);
 
         }
     }
@@ -238,9 +238,9 @@ public class ChemSpiderClient {
      * @param massSpecAPIStub
      * @param location
      * @return
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    private String sendRequest(String query, MassSpecAPIStub massSpecAPIStub, String location) throws ChemIDException {
+    private String sendRequest(String query, MassSpecAPIStub massSpecAPIStub, String location) throws ChemIDStructureException {
         String result = null;
         AsyncSimpleSearch asyncSimpleSearch = new AsyncSimpleSearch();
 
@@ -258,7 +258,7 @@ public class ChemSpiderClient {
                     .asyncSimpleSearch(asyncSimpleSearch)
                     .getAsyncSimpleSearchResult(), massSpecAPIStub, location);
         } catch (RemoteException e) {
-            throw new ChemIDException("Error occurred while downloading chemspider getChemicalStructuresByCsids: ", e);
+            throw new ChemIDStructureException("Error occurred while downloading chemspider getChemicalStructuresByCsids: ", e);
 
         }
         return result;
@@ -272,7 +272,7 @@ public class ChemSpiderClient {
      * @param stub     : MassSpecAPI instance.
      * @return : String of all molecules in sdf format.
      */
-    protected String downloadCompressedSDF(String rid, MassSpecAPIStub stub, String location) throws ChemIDException {
+    protected String downloadCompressedSDF(String rid, MassSpecAPIStub stub, String location) throws ChemIDStructureException {
         TransactionConfiguration tc = new TransactionConfiguration();
         tc.setTransactionTimeout(Integer.MAX_VALUE);
         stub._getServiceClient().getAxisConfiguration().setTransactionConfig(tc);
@@ -286,7 +286,7 @@ public class ChemSpiderClient {
                     Thread.sleep(Constants.ChemSpiderConstants.THREAD_TIME_OUT);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new ChemIDException("Error occurred while downloading chemspider downloadCompressedSDF: ", e);
+                    throw new ChemIDStructureException("Error occurred while downloading chemspider downloadCompressedSDF: ", e);
                 }
             }
         }
@@ -301,7 +301,7 @@ public class ChemSpiderClient {
             dh = getCompressedRecordsSdfResponse.getGetCompressedRecordsSdfResult();
 
         } catch (RemoteException e) {
-            throw new ChemIDException("Problem retrieving ChemSpider webservices: ", e);
+            throw new ChemIDStructureException("Problem retrieving ChemSpider webservices: ", e);
         }
         String savedFile = null;
 
@@ -318,9 +318,9 @@ public class ChemSpiderClient {
      *
      * @param sdfString : The String containing chemical structures in sdf format.
      * @return : The list of structures as iAtomContainer objects.
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    protected List<IAtomContainer> getAtomContainerFromString(String sdfString) throws ChemIDException {
+    protected List<IAtomContainer> getAtomContainerFromString(String sdfString) throws ChemIDStructureException {
         MDLV2000Reader reader = new MDLV2000Reader(new StringReader(sdfString));
         List<IAtomContainer> containersList;
         List<IAtomContainer> ret = new ArrayList<>();
@@ -333,7 +333,7 @@ public class ChemSpiderClient {
 
             reader.close();
         } catch (CDKException | IOException e) {
-            throw new ChemIDException("Problem getting atom container : ", e);
+            throw new ChemIDStructureException("Problem getting atom container : ", e);
 
         }
         return ret;

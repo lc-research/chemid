@@ -11,7 +11,7 @@
  */
 package org.chemid.structure.common;
 
-import org.chemid.structure.exception.ChemIDException;
+import org.chemid.structure.exception.ChemIDStructureException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -35,7 +35,7 @@ public class XmlParser {
      * @param xmlRecords
      * @return doc :Document
      */
-    public static Document stringToXML(String xmlRecords) throws ChemIDException {
+    public static Document stringToXML(String xmlRecords) throws ChemIDStructureException {
 
         DocumentBuilder db = null;
         Document doc = null;
@@ -47,7 +47,7 @@ public class XmlParser {
 
             doc = db.parse(is);
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new ChemIDException("Error occurred in xml Parser StringToXML : ", e);
+            throw new ChemIDStructureException("Error occurred in xml Parser StringToXML : ", e);
         }
 
         return doc;
@@ -59,7 +59,7 @@ public class XmlParser {
      * @param location
      * @return doc :Document
      */
-    public static Document getXMLPayload(String fileName, String location) throws ChemIDException {
+    public static Document getXMLPayload(String fileName, String location) throws ChemIDStructureException {
         Document doc = null;
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -70,7 +70,7 @@ public class XmlParser {
             doc = dBuilder.parse(new File(resource.getPath()));
         } catch (SAXException | IOException | ParserConfigurationException e) {
 
-            throw new ChemIDException("Error occurred in xml Parser getXMLPayload : ", e);
+            throw new ChemIDStructureException("Error occurred in xml Parser getXMLPayload : ", e);
         }
 
 
@@ -81,7 +81,7 @@ public class XmlParser {
      * @param doc: Document
      * @return output : String content of document
      */
-    public static String getStringFromDocument(Document doc) throws ChemIDException {
+    public static String getStringFromDocument(Document doc) throws ChemIDStructureException {
         String output = null;
         try {
             DOMSource domSource = new DOMSource(doc);
@@ -94,7 +94,7 @@ public class XmlParser {
 
         } catch (TransformerException e) {
 
-            throw new ChemIDException("Error occurred in xml Parser getStringFromDocument : ", e);
+            throw new ChemIDStructureException("Error occurred in xml Parser getStringFromDocument : ", e);
 
         }
 

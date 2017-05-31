@@ -13,7 +13,7 @@
 package org.chemid.structure.dbclient.hmdb;
 
 import org.chemid.structure.common.Constants;
-import org.chemid.structure.exception.ChemIDException;
+import org.chemid.structure.exception.ChemIDStructureException;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
@@ -44,9 +44,9 @@ public class HMDBClient {
      * @param upperMassValue
      * @param location
      * @return sdf file saved location
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String searchHMDB(double lowerMassValue, double upperMassValue, String location) throws ChemIDException, IOException {
+    public String searchHMDB(double lowerMassValue, double upperMassValue, String location) throws ChemIDStructureException, IOException {
 
         createFile(location);
 
@@ -107,9 +107,9 @@ public class HMDBClient {
 
     /**
      * @return
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    private Iterable<IAtomContainer> getIterables() throws ChemIDException {
+    private Iterable<IAtomContainer> getIterables() throws ChemIDStructureException {
         String doc = getResourceDocument();
         File sdfFile = new File(doc);
         Iterable<IAtomContainer> iterables;
@@ -121,7 +121,7 @@ public class HMDBClient {
                     inputStream, DefaultChemObjectBuilder.getInstance());
             iterables = () -> finalReader;
         } catch (IOException e) {
-            throw new ChemIDException("Error occurred while reading file: ", e);
+            throw new ChemIDStructureException("Error occurred while reading file: ", e);
         }
 
         return iterables;

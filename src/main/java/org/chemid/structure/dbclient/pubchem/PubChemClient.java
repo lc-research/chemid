@@ -16,7 +16,7 @@ import org.chemid.structure.common.Constants;
 import org.chemid.structure.common.RestClient;
 import org.chemid.structure.common.XmlParser;
 import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
-import org.chemid.structure.exception.ChemIDException;
+import org.chemid.structure.exception.ChemIDStructureException;
 import org.glassfish.jersey.client.ClientConfig;
 import org.w3c.dom.Document;
 
@@ -47,9 +47,9 @@ public class PubChemClient {
     /**
      * @param massRange
      * @return pubchemEsearch object
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public PubChemESearch getPubChemESearchRequestParameters(String massRange) throws ChemIDException {
+    public PubChemESearch getPubChemESearchRequestParameters(String massRange) throws ChemIDStructureException {
 
         this.restClient = new RestClient();
         //Get request to
@@ -83,9 +83,9 @@ public class PubChemClient {
     /**
      * @param massRange
      * @return url
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String getDownloadURL(String massRange) throws ChemIDException {
+    public String getDownloadURL(String massRange) throws ChemIDStructureException {
         String downloadUrl = null;
         //set webEnv, querykey to eSearch
         pubChemESearch = getPubChemESearchRequestParameters(massRange);
@@ -108,9 +108,9 @@ public class PubChemClient {
     /**
      * @param xmlPayload
      * @return url of sdf file
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String pubQuery(String xmlPayload) throws ChemIDException {
+    public String pubQuery(String xmlPayload) throws ChemIDStructureException {
         String pubQuery = null;
         try {
             //post request with query key, webenv
@@ -141,7 +141,7 @@ public class PubChemClient {
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new ChemIDException("Error occurred while downloading chemspider downloadCompressedSDF: ", e);
+            throw new ChemIDStructureException("Error occurred while downloading chemspider downloadCompressedSDF: ", e);
         }
         return pubQuery;
     }
@@ -149,9 +149,9 @@ public class PubChemClient {
     /**
      * @param requestID
      * @return verified url of sdf file
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String checkQuery(String requestID) throws ChemIDException {
+    public String checkQuery(String requestID) throws ChemIDStructureException {
         Document xmlPayload = null;
         xmlPayload = XmlParser.getXMLPayload(Constants.PubChemClient.CHECK_QUERY_FILE_NAME,
                 Constants.PubChemClient.PUBCHEM_RESOURCES);
@@ -173,9 +173,9 @@ public class PubChemClient {
      * @param fileUrl
      * @param location
      * @return sdf file saved location with file name
-     * @throws ChemIDException
+     * @throws ChemIDStructureException
      */
-    public String saveFile(String fileUrl, String location) throws ChemIDException {
+    public String saveFile(String fileUrl, String location) throws ChemIDStructureException {
         String savedPath = null;
         if (fileUrl != null) {
             try {
@@ -193,7 +193,7 @@ public class PubChemClient {
                     savedPath = location + '/' + fileName;
                 }
             } catch (IOException e) {
-                throw new ChemIDException("Error occurred while saving PubChem results file : ", e);
+                throw new ChemIDStructureException("Error occurred while saving PubChem results file : ", e);
 
             }
         }

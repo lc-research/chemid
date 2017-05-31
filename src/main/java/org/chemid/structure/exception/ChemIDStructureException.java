@@ -3,13 +3,13 @@ package org.chemid.structure.exception;
 /**
  * Exception class
  */
-public class ChemIDException extends Exception {
+public class ChemIDStructureException extends Exception {
     /**
      * @param message
      * @param e
      */
 
-    public ChemIDException(String message, Exception e) {
+    public ChemIDStructureException(String message, Exception e) {
         super(message, e);
     }
 }
