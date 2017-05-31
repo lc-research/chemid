@@ -1,3 +1,3 @@
 # chemid
 
-ChemID Chemical Structure Identification Platform
+ChemID Metabolites Identification Platform
