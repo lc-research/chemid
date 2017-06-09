@@ -20,10 +20,7 @@
     <packaging>pom</packaging>
     <version>1.0</version>
     <description>ChemID Chemical Structure Service</description>
-    <modules>
-        <module>preFilter</module>
-        <module>structure</module>
-    </modules>
+
     <dependencies>
         <!-- ******************** CDK Dependencies ************************************** -->
         <dependency>
