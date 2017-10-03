@@ -81,6 +81,7 @@ public class ChemicalStructureServiceRESTAPI {
                     PubChemClient pubChemClient = new PubChemClient(pubChemESearch);
                     String url = pubChemClient.getDownloadURL(PubchemTools.getMassRange(searchMass, massError));
                     sdfPath = pubChemClient.saveFile(url, loc.trim());
+
                     break;
                 case Constants.ChemSpiderConstants.CHEMSPIDER_DB_NAME:
                     String token = Constants.ChemSpiderConstants.CHEM_SPIDER_TOKEN;
