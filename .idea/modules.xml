@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/chemid.iml" filepath="$PROJECT_DIR$/.idea/chemid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/msmatch/msmatch.iml" filepath="$PROJECT_DIR$/msmatch/msmatch.iml" />
       <module fileurl="file://$PROJECT_DIR$/preFilter/preFilter.iml" filepath="$PROJECT_DIR$/preFilter/preFilter.iml" />
       <module fileurl="file://$PROJECT_DIR$/structure/structure.iml" filepath="$PROJECT_DIR$/structure/structure.iml" />
     </modules>

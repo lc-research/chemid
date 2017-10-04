@@ -23,6 +23,7 @@
     <modules>
         <module>preFilter</module>
         <module>structure</module>
+        <module>msmatch</module>
     </modules>
     <dependencies>
         <!-- ******************** CDK Dependencies ************************************** -->
