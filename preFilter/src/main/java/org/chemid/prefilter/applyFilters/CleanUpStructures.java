@@ -23,6 +23,7 @@ import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,7 +70,12 @@ public class CleanUpStructures {
     }
 
     public String FilterStructures() throws ChemIDPreFilterException, IOException {
-        int index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR);
+        int index =0;
+        index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR_LEFT);
+        if (index  <= 0) {
+            index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR);
+        }
+
         createFile(inputFilePath.substring(0, index));
         File sdfFile = new File(inputFilePath);
         if (!sdfFile.exists()) {
@@ -142,7 +148,9 @@ public class CleanUpStructures {
         return savedPath;
     }
 
-    private void createFile(String location) throws IOException {
+    private void createFile(String location2) throws IOException {
+        String location = Paths.get(location2).toString();
+        System.out.println(location+"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         String outputName = new SimpleDateFormat(Constants.SDF_FILE_NAME).format(new Date());
         if (location.endsWith(Constants.LOCATION_SEPARATOR)) {
             savedPath = location + outputName;
