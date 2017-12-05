@@ -13,7 +13,6 @@
 package restapi;
 
 import common.Constants;
-
 import dbclient.chemspider.ChemSpiderClient;
 import dbclient.hmdb.HMDBClient;
 import dbclient.hmdb.utilities.HMDBTools;
@@ -89,7 +88,6 @@ public class ChemicalStructureServiceRESTAPI {
                     sdfPath = client.getChemicalStructuresByMass(searchMass, massError, loc.trim());
                     break;
                 case Constants.HMDBConstants.HMDB_DB_NAME:
-
                     HMDBClient hmdbClient = new HMDBClient();
                     double lowerVal = HMDBTools.getLowerMassValue(searchMass, massError);
                     double upperVal = HMDBTools.getUpperMassValue(searchMass, error);
