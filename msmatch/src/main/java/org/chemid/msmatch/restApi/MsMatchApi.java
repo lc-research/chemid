@@ -44,7 +44,7 @@ public class MsMatchApi {
             @FormParam("prob_thresh") double problemThreshold,
             @FormParam("score_type") String scoreType,
             @FormParam("output_file_path") String outputFilePath,
-            @FormParam("org/chemid/msmatch/algorithm") String algorithm) {
+            @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);
         IteratingSDFReader reader = null;
