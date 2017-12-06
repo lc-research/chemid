@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.chemid</groupId>
+    <groupId>org.chemid.msmatch.restApi</groupId>
     <artifactId>ms-match</artifactId>
     <version>1.1-SNAPSHOT</version>
     <dependencies>
@@ -89,7 +89,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>restApi.Application</Main-Class>
+                                        <Main-Class>org.chemid.msmatch.restApi.Application</Main-Class>
                                     </manifestEntries>
                                 </transformer>
 
