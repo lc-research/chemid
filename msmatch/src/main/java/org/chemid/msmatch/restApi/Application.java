@@ -1,6 +1,6 @@
-package restApi;
+package org.chemid.msmatch.restApi;
 
-import common.Constants;
+import org.chemid.msmatch.common.Constants;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;

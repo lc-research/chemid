@@ -1,4 +1,4 @@
-package common;
+package org.chemid.msmatch.common;
 
 public class Constants {
     public static final int PORT_NO = 8080;

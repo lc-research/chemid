@@ -1,8 +1,9 @@
-package restApi;
+package org.chemid.msmatch.restApi;
 
-import algorithm.CFMIDAlgorithm;
-import common.CommonClasses;
-import common.Constants;
+import org.chemid.msmatch.algorithm.CFMIDAlgorithm;
+import org.chemid.msmatch.common.CommonClasses;
+import org.chemid.msmatch.common.Constants;
+import org.chemid.msmatch.exception.ChemIDMsMatchException;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.inchi.InChIGeneratorFactory;
@@ -19,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static common.Constants.DATA_SEPARATOR;
+import static org.chemid.msmatch.common.Constants.DATA_SEPARATOR;
 
 @Path("/rest/msmatch")
 public class MsMatchApi {
@@ -43,10 +44,14 @@ public class MsMatchApi {
             @FormParam("prob_thresh") double problemThreshold,
             @FormParam("score_type") String scoreType,
             @FormParam("output_file_path") String outputFilePath,
-            @FormParam("algorithm") String algorithm) {
+            @FormParam("org/chemid/msmatch/algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);
         IteratingSDFReader reader = null;
+        if(!sdfFile.exists()){
+            return "Candidate File not Exit or invalid file";
+        }
+
         ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
 
 
@@ -77,19 +82,28 @@ public class MsMatchApi {
 
 
         } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
+            LOGGER.error("Something wrong with file paths", e1);
         }
 
         String newCandidateFilePAth = null;
         newCandidateFilePAth=saveNewCandidateFile(candidateFilePath, map);
         if (algorithm.equals(Constants.CFMID)) {
             CFMIDAlgorithm cfm = new CFMIDAlgorithm();
-            outPutPath = cfm.rankstructures(newCandidateFilePAth, spectrumFilePath, ppmMassTollerence, absMassTollerence, problemThreshold, scoreType, outputFilePath);
+            try {
+                outPutPath = cfm.rankstructures(newCandidateFilePAth, spectrumFilePath, ppmMassTollerence, absMassTollerence, problemThreshold, scoreType, outputFilePath);
+            } catch (ChemIDMsMatchException e) {
+                LOGGER.error(Constants.OUTPUT_WRITE_ERROR,e);
+            }
+        }else {
+            outputFilePath="Invalid algorithm selection";
+        }
+        if (outputFilePath==null){
+             outputFilePath = "Sorry!Something going wrong.";
         }
         return outPutPath;
     }
 
-    private String saveNewCandidateFile(String candidateFilePath, final ConcurrentMap<String, String> map) {
+    private String saveNewCandidateFile(String candidateFilePath, final ConcurrentMap<String, String> map)  {
         CommonClasses getpath = new CommonClasses();
         String newFilePath = null;
 
@@ -101,23 +115,25 @@ public class MsMatchApi {
             try(Writer writer = Files.newBufferedWriter(newFile)) {
                 map.forEach((key, value) -> {
                     try { writer.write(key + DATA_SEPARATOR + value + System.lineSeparator()); }
-                    catch (IOException ex) { throw new UncheckedIOException(ex); }
+                    catch (IOException ex) {
+                        LOGGER.error("Something wrong with candidate file.",ex); }
                 });
-            } catch(UncheckedIOException ex) { throw ex.getCause(); }
+            } catch(UncheckedIOException ex) {
+                LOGGER.error("Error while writing writing candidate file",ex); }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Candidate file not found",e);
         }
 
         return newFilePath;
     }
 
-    private String generateInChI(IAtomContainer mol) {
+    private String generateInChI(IAtomContainer mol)  {
         String inchi = null;
         try {
             InChIGeneratorFactory generator = InChIGeneratorFactory.getInstance();
             inchi = generator.getInChIGenerator(mol).getInchi();
         } catch (CDKException e) {
-            e.printStackTrace();
+            LOGGER.error("Something wrong with generating Inchi",e);
         }
 
         return inchi;

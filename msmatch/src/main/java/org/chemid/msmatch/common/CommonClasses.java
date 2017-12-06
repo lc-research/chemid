@@ -1,4 +1,4 @@
-package common;
+package org.chemid.msmatch.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 public class CommonClasses {
     SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIME_STAMP_FORMAT);
 
-    public String createOutputFileTimeStamp(String OutputFilePath) throws IOException {
+    public String createOutputFileTimeStamp(String OutputFilePath){
         int index = OutputFilePath.lastIndexOf('/');
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String fileName =dateFormat.format(timestamp);

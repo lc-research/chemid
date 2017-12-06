@@ -1,16 +1,18 @@
-package algorithm;
+package org.chemid.msmatch.algorithm;
 
-import common.CommonClasses;
-import common.Constants;
+import org.chemid.msmatch.common.CommonClasses;
+import org.chemid.msmatch.common.Constants;
+import org.chemid.msmatch.exception.ChemIDMsMatchException;
 
 import java.io.*;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+
+import static org.chemid.msmatch.common.Constants.OUTPUT_WRITE_ERROR;
 
 public class CFMIDAlgorithm {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIME_STAMP_FORMAT);
 
-    public String rankstructures(String candidateFilePath, String spectrumFilePath, double ppmMassTollerence, double absMassTollerence, double problemThreshold, String scoreType, String outputFilePath) {
+    public String rankstructures(String candidateFilePath, String spectrumFilePath, double ppmMassTollerence, double absMassTollerence, double problemThreshold, String scoreType, String outputFilePath) throws ChemIDMsMatchException {
         File candidateFile = new File(candidateFilePath);
         File spectrumFile = new File(spectrumFilePath);
         CommonClasses createFile = new CommonClasses();
@@ -21,11 +23,7 @@ public class CFMIDAlgorithm {
         if (!spectrumFile.exists()) {
             return Constants.SPECTRUM_NOT_FOUND;
         }
-        try {
-            createdOutPutFile  = createFile.createOutputFileTimeStamp(outputFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        createdOutPutFile = createFile.createOutputFileTimeStamp(outputFilePath);
 
 
         try {
@@ -36,13 +34,12 @@ public class CFMIDAlgorithm {
             File output_file = new File(classLoader.getResource("param_output0.log").getFile());
 
             System.out.println(output_file.getAbsolutePath());
-            String command = Constants.CFM_FILE_PATH + Constants.CALL_CFM + " "+spectrumFilePath +" "+ Constants.CFMID_ID + " "+candidateFilePath + " "+Constants.NUM_HIGHEST +" "+ ppmMassTollerence + " "+absMassTollerence + " "+problemThreshold +" "+ output_file.getAbsolutePath() +" "+ config_file.getAbsolutePath() + " "+scoreType;
+            String command = Constants.CFM_FILE_PATH + Constants.CALL_CFM + " " + spectrumFilePath + " " + Constants.CFMID_ID + " " + candidateFilePath + " " + Constants.NUM_HIGHEST + " " + ppmMassTollerence + " " + absMassTollerence + " " + problemThreshold + " " + output_file.getAbsolutePath() + " " + config_file.getAbsolutePath() + " " + scoreType;
             Process proc = Runtime.getRuntime().exec(command);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             BufferedReader error = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
             if (error.readLine() != null) {
-                System.out.println(error.readLine()+"############### error ##############");
             }
             String sCurrentLine;
 
@@ -59,8 +56,7 @@ public class CFMIDAlgorithm {
             error.close();
             return outputFilePath;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ChemIDMsMatchException(OUTPUT_WRITE_ERROR, e);
         }
-        return Constants.OUTPUT_WRITE_ERROR;
     }
 }
