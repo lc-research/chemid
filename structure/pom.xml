@@ -17,9 +17,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.chemid</groupId>
     <artifactId>structure</artifactId>
-    <packaging>pom</packaging>
-    <version>1.1</version>
-    <description>ChemID Chemical Structure Service</description>
+    <version>1.1-SNAPSHOT</version>
 
     <dependencies>
         <!-- ******************** CDK Dependencies ************************************** -->
