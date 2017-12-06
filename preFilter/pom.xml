@@ -16,9 +16,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.chemid</groupId>
-    <artifactId>structure</artifactId>
+    <artifactId>prefilter</artifactId>
     <packaging>pom</packaging>
-    <version>1.0</version>
+    <version>1.1</version>
     <description>ChemID Chemical Structure Service</description>
 
     <dependencies>
@@ -63,34 +63,7 @@
             <artifactId>cdk-data</artifactId>
             <version>${cdk.version}</version>
         </dependency>
-        <!-- ************************************************************************************* -->
-        <!--Apache AXIS 2 dependencies for ChemSpider-->
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-kernel</artifactId>
-            <version>${axis2.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>jsr311-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-adb</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-http</artifactId>
-            <version>${axis2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-transport-local</artifactId>
-            <version>1.7.1</version>
-        </dependency>
+
         <!-- ***************************************************************************************** -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -145,28 +118,6 @@
         <plugins>
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <id>prepare</id>
-                        <phase>validate</phase>
-                        <configuration>
-                            <tasks>
-                                <echo message="prepare phase" />
-                                <unzip src="src\main\resources\dbclient\hmdb\hmdb.zip" dest="src\main\resources\dbclient\hmdb">
-
-                                </unzip>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
 
             <plugin>
@@ -188,9 +139,9 @@
                                         <Main-Class>restapi.Application</Main-Class>
                                     </manifestEntries>
                                 </transformer>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                                    <resource>.sdf</resource>
-                                </transformer>
+                                <!--<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">-->
+                                    <!--<resource>.sdf</resource>-->
+                                <!--</transformer>-->
                             </transformers>
                         </configuration>
                     </execution>
@@ -200,6 +151,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

@@ -15,7 +15,9 @@ public class Constants {
     public static final int PORT_NO = 8080;
     public static final int INIT_ORDER = 0;
 
-    public static final String LOCATION_SEPARATOR = "/";
+    public static final String LOCATION_SEPARATOR = "\\";
+    public static final String LOCATION_SEPARATOR_LEFT = "/";
+
     public static final String SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
 
 
