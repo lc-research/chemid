@@ -3,48 +3,17 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.chemid</groupId>
+        <artifactId>chemid-parent</artifactId>
+        <version>1.0</version>
+    </parent>
 
-    <groupId>org.chemid.msmatch.restApi</groupId>
-    <artifactId>ms-match</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.chemid</groupId>
+    <artifactId>msmatch</artifactId>
+    <version>1.0</version>
     <dependencies>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${jersy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-jetty-servlet</artifactId>
-            <version>${jersy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersy.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.stanfy</groupId>
             <artifactId>gson-xml-java</artifactId>
@@ -110,13 +79,7 @@
 
         </plugins></build>
     <properties>
-        <jetty.version>9.3.2.v20150730</jetty.version>
-        <jersy.version>2.7</jersy.version>
         <mvn.shade.version>2.4.1</mvn.shade.version>
-        <logback.version>1.0.13</logback.version>
-        <testng.version>6.1.1</testng.version>
         <gson.xml.version>0.1.7</gson.xml.version>
-        <jersey.client.version>1.19.1</jersey.client.version>
-
     </properties>
 </project>

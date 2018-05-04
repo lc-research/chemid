@@ -50,8 +50,6 @@ public class CFMIDAlgorithm {
             }
 
             writer.close();
-
-
             reader.close();
             error.close();
             return outputFilePath;
