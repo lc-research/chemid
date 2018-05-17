@@ -18,13 +18,6 @@ import org.apache.axis2.transaction.TransactionConfiguration;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.io.IOUtils;
 import org.chemid.structure.common.Constants;
-import org.openscience.cdk.ChemFile;
-import org.openscience.cdk.ChemObject;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.MDLV2000Reader;
-import org.openscience.cdk.tools.manipulator.ChemFileManipulator;
-
 import javax.activation.DataHandler;
 import java.io.*;
 import java.lang.String;
@@ -33,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /**
@@ -42,7 +36,6 @@ public class ChemSpiderClient {
 
     private static ChemSpiderClient client;
     protected String token = Constants.ChemSpiderConstants.TOKEN;
-    protected IAtomContainer[] candidates = null;
     protected boolean verbose;
     private Integer CONNECTION_TIMEOUT = Constants.ChemSpiderConstants.CONNECTION_TIMEOUT;
     private Integer SO_TIME_OUT = Constants.ChemSpiderConstants.SO_TIME_OUT;
@@ -188,7 +181,6 @@ public class ChemSpiderClient {
      */
     public String getChemicalStructuresByCsids(int[] csidsList, String location) throws ChemIDStructureException {
         String sdfPath = null;
-        List<IAtomContainer> cons = new ArrayList<>();
         String timeOut = HTTPConstants.CONNECTION_TIMEOUT;
         try {
 
@@ -198,27 +190,18 @@ public class ChemSpiderClient {
             massSpecAPIStub._getServiceClient().getOptions().setProperty(HTTPConstants.SO_TIMEOUT, soTimeOut);
             List<String> csids = new ArrayList<>();
 
-            if (csidsList.length == 1) {
-                this.candidates = new IAtomContainer[1];
-                MassSpecAPIStub.GetRecordMol getRecordMol = new MassSpecAPIStub.GetRecordMol();
-                getRecordMol.setCsid(String.valueOf(csidsList[0]));
-                getRecordMol.setToken(this.token);
-                MassSpecAPIStub.GetRecordMolResponse grmr = massSpecAPIStub.getRecordMol(getRecordMol);
-                cons = this.getAtomContainerFromString(grmr.getGetRecordMolResult());
-                csids.add(String.valueOf(0));
-                this.candidates[0] = cons.get(0);
 
-            } else if (csidsList.length > 0) {
-                StringBuilder b = new StringBuilder();
+            StringBuilder b = new StringBuilder();
 
-                for (int csid : csidsList) {
+            for (int csid : csidsList) {
                     b.append(csid);
                     b.append(",");
+
                 }
 
                 sdfPath = sendRequest(b.toString(), massSpecAPIStub, location);
 
-            }
+
             massSpecAPIStub._getServiceClient().cleanupTransport();
             massSpecAPIStub.cleanup();
 
@@ -309,29 +292,9 @@ public class ChemSpiderClient {
         return savedFile;
     }
 
-    /**
-     * Read the sdf string and get the iAtomContainer object.
-     *
-     * @param sdfString : The String containing chemical structures in sdf format.
-     * @return : The list of structures as iAtomContainer objects.
-     * @throws ChemIDStructureException
-     */
-    protected List<IAtomContainer> getAtomContainerFromString(String sdfString) throws ChemIDStructureException {
-        MDLV2000Reader reader = new MDLV2000Reader(new StringReader(sdfString));
-        List<IAtomContainer> containersList;
-        List<IAtomContainer> ret = new ArrayList<>();
-        try {
-            ChemFile chemFile = (ChemFile) reader.read((ChemObject) new ChemFile());
-            containersList = ChemFileManipulator.getAllAtomContainers(chemFile);
-            for (IAtomContainer container : containersList) {
-                ret.add(container);
-            }
 
-            reader.close();
-        } catch (CDKException | IOException e) {
-            throw new ChemIDStructureException("Problem getting atom container : ", e);
+    private static final Logger LOG = Logger.getLogger(ChemSpiderClient.class.getName());
 
-        }
-        return ret;
-    }
+
+
 }
