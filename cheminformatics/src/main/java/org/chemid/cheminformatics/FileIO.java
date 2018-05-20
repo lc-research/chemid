@@ -63,10 +63,9 @@ public class FileIO {
                                     return false;
                                 }
                             }
-                    ).forEach(mol -> {
+                    ).forEach(filteredIAtomContainer -> {
                 try {
-                    //System.out.println(mol.getAtomCount());
-                    sdfWriter.write(mol);
+                    sdfWriter.write(filteredIAtomContainer);
                 }
                 catch(CDKException e){
                     throw new RuntimeException(e);
