@@ -47,7 +47,7 @@
                   </manifestEntries>
                 </transformer>
                 <transformer>
-                  <resource>.sdf</resource>
+                  <resource>.zip</resource>
                 </transformer>
               </transformers>
             </configuration>
@@ -91,6 +91,7 @@
     <cdk.version>1.5.13</cdk.version>
     <mvn.shade.version>2.4.1</mvn.shade.version>
     <jersey.client.version>1.19.1</jersey.client.version>
+    <cheminformatics.version>1.0</cheminformatics.version>
     <gson.xml.version>0.1.7</gson.xml.version>
     <axis2.version>1.7.1</axis2.version>
   </properties>

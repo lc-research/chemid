@@ -14,6 +14,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
         <groupId>org.chemid</groupId>
         <artifactId>chemid-parent</artifactId>
@@ -25,6 +26,12 @@
     <artifactId>structure</artifactId>
     <version>1.0</version>
     <dependencies>
+        <dependency>
+            <groupId>org.chemid</groupId>
+            <artifactId>cheminformatics</artifactId>
+            <version>${cheminformatics.version}</version>
+        </dependency>
+
         <!-- ************************************************************************************* -->
         <!--Apache AXIS 2 dependencies for ChemSpider-->
         <dependency>
@@ -70,7 +77,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -126,7 +132,7 @@
                                 </manifestEntries>
                             </transformer>
                             <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                                <resource>.sdf</resource>
+                                <resource>.zip</resource>
                             </transformer>
                         </transformers>
                     </configuration>
@@ -154,5 +160,6 @@
         <cdk.version>1.5.13</cdk.version>
         <axis2.version>1.7.1</axis2.version>
         <chemspider.version>1.0</chemspider.version>
+        <cheminformatics.version>1.0</cheminformatics.version>
     </properties>
 </project>

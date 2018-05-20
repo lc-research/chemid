@@ -34,8 +34,7 @@ public static final String NO_COMPOUNDS = "0 compounds!";
     }
 
     public static class HMDBConstants {
-        public static final String HMDB_RESOURCES = "dbclient/hmdb/";
-        public static final String HMDB_OUTPUT_FILE = "hmdb.sdf";
+        public static final String HMDB_FILE_PATH = "dbclient/hmdb/hmdb.sdf";
         public static final String HMDB_MOLECULAR_WEIGHT = "MIMW";
         public static final String HMDB_DB_NAME = "hmdb";
         public static final String HMDB_ID = "ID";

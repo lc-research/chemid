@@ -21,6 +21,7 @@ import org.chemid.structure.dbclient.pubchem.beans.PubChemESearch;
 import org.chemid.structure.dbclient.pubchem.utilities.PubchemTools;
 import org.chemid.structure.dbclient.utilities.Tools;
 import org.chemid.structure.exception.ChemIDStructureException;
+import org.openscience.cdk.exception.CDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,14 +91,14 @@ public class ChemicalStructureServiceRESTAPI {
                 case Constants.HMDBConstants.HMDB_DB_NAME:
                     HMDBClient hmdbClient = new HMDBClient();
                     double lowerVal = HMDBTools.getLowerMassValue(searchMass, massError);
-                    double upperVal = HMDBTools.getUpperMassValue(searchMass, error);
+                    double upperVal = HMDBTools.getUpperMassValue(searchMass, massError);
                     sdfPath = hmdbClient.searchHMDB(lowerVal, upperVal, loc.trim());
                     break;
                 default:
                     sdfPath = null;
                     break;
             }
-        } catch (ChemIDStructureException | RuntimeException | IOException e) {
+        } catch (ChemIDStructureException | RuntimeException | CDKException | IOException e) {
             LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG, e);
 
         }
