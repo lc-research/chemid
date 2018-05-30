@@ -16,13 +16,9 @@ import org.chemid.msmatch.algorithm.CFMIDAlgorithm;
 import org.chemid.msmatch.common.CommonClasses;
 import org.chemid.msmatch.common.Constants;
 import org.chemid.msmatch.exception.ChemIDMsMatchException;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.inchi.InChIGeneratorFactory;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.chemid.cheminformatics.FileIO.getmolProperty;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -59,44 +55,14 @@ public class MsMatchApi {
             @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);
-        IteratingSDFReader reader = null;
+
         if(!sdfFile.exists()){
             return "Candidate File not Exit or invalid file";
         }
 
         ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
-
-
-        try {
-            reader = new IteratingSDFReader(
-                    new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
-
-            while (reader.hasNext()) {
-                IAtomContainer molecule = (IAtomContainer) reader.next();
-                String inChI = generateInChI(molecule);
-                if (molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID))) {
-
-                        map.put(molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID), inChI);
-                    }
-                } else if (molecule.getProperty(Constants.CHEMSPIDER_CSID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.CHEMSPIDER_CSID))) {
-
-                        map.put(molecule.getProperty(Constants.CHEMSPIDER_CSID), inChI);
-                    }
-                } else if (molecule.getProperty(Constants.HMDB_ID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.HMDB_ID))) {
-
-                        map.put(molecule.getProperty(Constants.HMDB_ID), inChI);
-                    }
-                }
-            }
-
-
-        } catch (FileNotFoundException e1) {
-            LOGGER.error("Something wrong with file paths", e1);
-        }
-
+        getmolProperty(candidateFilePath,Constants.PUBCHEM_COMPOUND_CID,Constants.CHEMSPIDER_CSID,Constants.HMDB_ID);
+        //
         String newCandidateFilePAth = null;
         newCandidateFilePAth=saveNewCandidateFile(candidateFilePath, map);
         if (algorithm.equals(Constants.CFMID)) {
@@ -110,7 +76,7 @@ public class MsMatchApi {
             outputFilePath="Invalid algorithm selection";
         }
         if (outputFilePath==null){
-             outputFilePath = "Sorry!Something going wrong.";
+            outputFilePath = "Sorry!Something going wrong.";
         }
         return outPutPath;
     }
@@ -139,16 +105,6 @@ public class MsMatchApi {
         return newFilePath;
     }
 
-    private String generateInChI(IAtomContainer mol)  {
-        String inchi = null;
-        try {
-            InChIGeneratorFactory generator = InChIGeneratorFactory.getInstance();
-            inchi = generator.getInChIGenerator(mol).getInchi();
-        } catch (CDKException e) {
-            LOGGER.error("Something wrong with generating Inchi",e);
-        }
 
-        return inchi;
-    }
 
 }
