@@ -54,7 +54,7 @@ public class ChemicalPreFilterRESTAPI {
                 CleanUpStructures preFilter = new CleanUpStructures(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
                 savedPath = preFilter.FilterStructures();
             }
-        } catch (ChemIDPreFilterException | RuntimeException | IOException e) {
+        } catch (Exception e) {
             LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG_PREFILTER, e);
 
         }
