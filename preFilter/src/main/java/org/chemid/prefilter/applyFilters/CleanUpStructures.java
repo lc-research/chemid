@@ -22,33 +22,33 @@ import static org.chemid.cheminformatics.FileIO.Structures;
 
 
 public class CleanUpStructures {
-    private String inputFilePath1, keepCompounds1, mustContain1;
-    private boolean removeDisconnected1, removeHeavyIsotopes1, removeStereoisomers1, eliminateCharges1, keepPositiveCharges1;
-    private List<String> keepCompoundsWith1, compoundsMustContain1;
-    private ConcurrentMap<String, String> map1;
+    private String inputFilePath, keepCompounds, mustContain;
+    private boolean removeDisconnected, removeHeavyIsotopes, removeStereoisomers, eliminateCharges, keepPositiveCharges;
+    private List<String> keepCompoundsWith, compoundsMustContain;
+    private ConcurrentMap<String, String> map;
 
 
     public CleanUpStructures(String inputFilePath, boolean removeDisconnected, boolean removeHeavyIsotopes, boolean removeStereoisomers, String keepCompounds, String mustContain, boolean eliminateCharges, boolean keepPositiveCharges) {
-        this.inputFilePath1 = inputFilePath;
-        this.removeDisconnected1 = removeDisconnected;
-        this.removeHeavyIsotopes1 = removeHeavyIsotopes;
-        this.removeStereoisomers1 = removeStereoisomers;
-        this.eliminateCharges1 = eliminateCharges;
-        this.keepCompounds1 = keepCompounds;
+        this.inputFilePath = inputFilePath;
+        this.removeDisconnected = removeDisconnected;
+        this.removeHeavyIsotopes = removeHeavyIsotopes;
+        this.removeStereoisomers = removeStereoisomers;
+        this.eliminateCharges = eliminateCharges;
+        this.keepCompounds = keepCompounds;
 
-        this.mustContain1 = mustContain;
-        this.keepPositiveCharges1 = keepPositiveCharges;
-        map1 = new ConcurrentHashMap<>();
+        this.mustContain = mustContain;
+        this.keepPositiveCharges = keepPositiveCharges;
+        map = new ConcurrentHashMap<>();
         if (keepCompounds.length() > 0) {
-            keepCompoundsWith1 = new ArrayList<>(Arrays.asList(keepCompounds.split(",")));
+            keepCompoundsWith = new ArrayList<>(Arrays.asList(keepCompounds.split(",")));
         } else {
-            keepCompoundsWith1 = new ArrayList<>();
+            keepCompoundsWith = new ArrayList<>();
         }
         if (mustContain.length() > 0) {
-            compoundsMustContain1 = new ArrayList<>(Arrays.asList(mustContain.split(",")));
-            compoundsMustContain1.replaceAll(String::toUpperCase);
+            compoundsMustContain = new ArrayList<>(Arrays.asList(mustContain.split(",")));
+            compoundsMustContain.replaceAll(String::toUpperCase);
         } else {
-            compoundsMustContain1 = new ArrayList<>();
+            compoundsMustContain = new ArrayList<>();
         }
     }
 
