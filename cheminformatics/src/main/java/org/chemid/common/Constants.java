@@ -3,7 +3,7 @@ package org.chemid.common;
 public class Constants {
     public static final String LOCATION_SEPARATOR = "\\";
     public static final String LOCATION_SEPARATOR_LEFT = "/";
-    public static final String SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
+    public static final String SDF_FILE_NAME = "yyyy.MM.dd.hh.mm.ss'.sdf'";
     public static final String CHEMSPIDER_CSID = "CSID";
     public static final String HMDB_ID = "ID";
     public static final String FILE_NOT_FOUND = "Resource file not found!";
