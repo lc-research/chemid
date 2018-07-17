@@ -27,6 +27,8 @@ public class Constants {
     public static final String HMDB_ID = "ID";
     public static final String PUBCHEM_COMPOUND_CID = "PUBCHEM_COMPOUND_CID";
     public static final String CHEMSPIDER_CSID = "CSID";
-public static final String DATA_SEPARATOR = " ";
-public static final String TIME_STAMP_FORMAT = "yyyy.MM.dd.HH.mm.ss";
+    public static final String DATA_SEPARATOR = " ";
+    public static final String TIME_STAMP_FORMAT = "yyyy.MM.dd.HH.mm.ss";
+    public static final String OUT_PUT_FILE = "/home/lclab/installed/cfmid/test_model/param_output0.log";
+    public static final String CONFIG_FILE = "/home/lclab/installed/cfmid/test_model/param_config.txt";
 }
