@@ -10,14 +10,21 @@
  *  specific language governing permissions and limitations under the License.
  */
 
-package org.chemid.msmatch.restApi;
+package org.chemid.msmatch.restapi;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.chemid.msmatch.algorithm.CFMIDAlgorithm;
 import org.chemid.msmatch.common.CommonClasses;
 import org.chemid.msmatch.common.Constants;
 import org.chemid.msmatch.exception.ChemIDMsMatchException;
+import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.inchi.InChIGeneratorFactory;
+import org.openscience.cdk.interfaces.IAtomContainer;
+import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.chemid.cheminformatics.FileIO.addPropertySDF;
 import static org.chemid.cheminformatics.FileIO.getmolProperty;
 
 import javax.ws.rs.*;
@@ -25,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -55,16 +63,12 @@ public class MsMatchApi {
             @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);
-
-        if(!sdfFile.exists()){
-            return "Candidate File not Exit or invalid file";
-        }
-
         ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
-        getmolProperty(candidateFilePath,Constants.PUBCHEM_COMPOUND_CID,Constants.CHEMSPIDER_CSID,Constants.HMDB_ID);
-        //
+        //CDK dependecies method import from Cheminfomatics
+        getmolProperty(sdfFile,Constants.PUBCHEM_COMPOUND_CID,Constants.CHEMSPIDER_CSID,Constants.HMDB_ID,map);
         String newCandidateFilePAth = null;
         newCandidateFilePAth=saveNewCandidateFile(candidateFilePath, map);
+
         if (algorithm.equals(Constants.CFMID)) {
             CFMIDAlgorithm cfm = new CFMIDAlgorithm();
             try {
@@ -76,23 +80,38 @@ public class MsMatchApi {
             outputFilePath="Invalid algorithm selection";
         }
         if (outputFilePath==null){
-            outputFilePath = "Sorry!Something going wrong.";
+            outputFilePath="Sorry!Something going wrong.";
+        }
+
+        CommonClasses getpath = new CommonClasses();
+
+        try {
+            File createdFile=getLatestFilefromDir(outputFilePath);
+            HashMap<String,String>val=getScores(createdFile);
+            addPropertySDF(candidateFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return outPutPath;
     }
 
+    /**
+     *
+     * @param candidateFilePath
+     * @param map
+     * @return
+     */
     private String saveNewCandidateFile(String candidateFilePath, final ConcurrentMap<String, String> map)  {
-        CommonClasses getpath = new CommonClasses();
+
         String newFilePath = null;
-
+        CommonClasses getpath = new CommonClasses();
         try {
-
             newFilePath = getpath.createOutputFileTimeStamp(candidateFilePath);
             java.nio.file.Path newFile = Paths.get(newFilePath);
-
             try(Writer writer = Files.newBufferedWriter(newFile)) {
                 map.forEach((key, value) -> {
-                    try { writer.write(key + DATA_SEPARATOR + value + System.lineSeparator()); }
+                    try { writer.write(key + DATA_SEPARATOR + value + System.lineSeparator());
+                    }
                     catch (IOException ex) {
                         LOGGER.error("Something wrong with candidate file.",ex); }
                 });
@@ -106,5 +125,46 @@ public class MsMatchApi {
     }
 
 
+
+    /**
+     *
+     * @param inputfile
+     * @return
+     * @throws IOException
+     */
+
+
+    public HashMap<String,String> getScores(File inputfile) throws IOException {
+        HashMap<String, String> map = new HashMap<>();
+        BufferedReader br = new BufferedReader(new FileReader(inputfile));
+        String sCurrentLine;
+        while ((sCurrentLine = br.readLine()) != null) {
+            String parts[] = sCurrentLine.split(" ");
+            map.put(parts[2], parts[1]);
+        }
+        return map;
+
+    }
+
+    /**
+     *
+     * @param dirPath
+     * @return
+     */
+    public File getLatestFilefromDir(String dirPath){
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        File lastModifiedFile = files[0];
+        for (int i = 1; i < files.length; i++) {
+            if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+                lastModifiedFile = files[i];
+            }
+        }
+        return lastModifiedFile;
+    }
 
 }
