@@ -18,11 +18,12 @@ import org.chemid.msmatch.exception.ChemIDMsMatchException;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+
 
 import static org.chemid.msmatch.common.Constants.OUTPUT_WRITE_ERROR;
 
 public class CFMIDAlgorithm {
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.TIME_STAMP_FORMAT);
 
     public String rankstructures(String candidateFilePath, String spectrumFilePath, double ppmMassTollerence, double absMassTollerence, double problemThreshold, String scoreType, String outputFilePath) throws ChemIDMsMatchException {
         File candidateFile = new File(candidateFilePath);
@@ -37,21 +38,19 @@ public class CFMIDAlgorithm {
         }
         createdOutPutFile = createFile.createOutputFileTimeStamp(outputFilePath);
 
-
         try {
 
             ClassLoader classLoader = getClass().getClassLoader();
 
             File config_file = new File(classLoader.getResource("param_config.txt").getFile());
             File output_file = new File(classLoader.getResource("param_output0.log").getFile());
-
-            System.out.println(output_file.getAbsolutePath());
-            String command = Constants.CFM_FILE_PATH + Constants.CALL_CFM + " " + spectrumFilePath + " " + Constants.CFMID_ID + " " + candidateFilePath + " " + Constants.NUM_HIGHEST + " " + ppmMassTollerence + " " + absMassTollerence + " " + problemThreshold + " " + output_file.getAbsolutePath() + " " + config_file.getAbsolutePath() + " " + scoreType;
+            String command = Constants.CFM_FILE_PATH + Constants.CALL_CFM + " " + spectrumFilePath + " " + Constants.CFMID_ID + " " + candidateFilePath + " " + Constants.NUM_HIGHEST + " " + ppmMassTollerence + " " + absMassTollerence + " " + problemThreshold + " " + Constants.OUT_PUT_FILE + " " + Constants.CONFIG_FILE + " " + scoreType;
             Process proc = Runtime.getRuntime().exec(command);
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+
             BufferedReader error = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
             if (error.readLine() != null) {
+                System.out.println(error.readLine()+"############### error ##############");
             }
             String sCurrentLine;
 
@@ -64,6 +63,7 @@ public class CFMIDAlgorithm {
             writer.close();
             reader.close();
             error.close();
+
             return outputFilePath;
         } catch (IOException e) {
             throw new ChemIDMsMatchException(OUTPUT_WRITE_ERROR, e);
