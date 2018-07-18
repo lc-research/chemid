@@ -10,8 +10,9 @@
  *  specific language governing permissions and limitations under the License.
  */
 
-package org.chemid.msmatch.restApi;
+package org.chemid.msmatch.restapi;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.chemid.msmatch.algorithm.CFMIDAlgorithm;
 import org.chemid.msmatch.common.CommonClasses;
 import org.chemid.msmatch.common.Constants;
@@ -23,12 +24,15 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.chemid.cheminformatics.FileIO.addPropertySDF;
+import static org.chemid.cheminformatics.FileIO.getmolProperty;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -59,46 +63,12 @@ public class MsMatchApi {
             @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);
-        IteratingSDFReader reader = null;
-        if(!sdfFile.exists()){
-            return "Candidate File not Exit or invalid file";
-        }
-
         ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
-
-
-        try {
-            reader = new IteratingSDFReader(
-                    new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
-
-            while (reader.hasNext()) {
-                IAtomContainer molecule = (IAtomContainer) reader.next();
-                String inChI = generateInChI(molecule);
-                if (molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID))) {
-
-                        map.put(molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID), inChI);
-                    }
-                } else if (molecule.getProperty(Constants.CHEMSPIDER_CSID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.CHEMSPIDER_CSID))) {
-
-                        map.put(molecule.getProperty(Constants.CHEMSPIDER_CSID), inChI);
-                    }
-                } else if (molecule.getProperty(Constants.HMDB_ID) != null) {
-                    if (map.size()<150 &&!map.containsKey(molecule.getProperty(Constants.HMDB_ID))) {
-
-                        map.put(molecule.getProperty(Constants.HMDB_ID), inChI);
-                    }
-                }
-            }
-
-
-        } catch (FileNotFoundException e1) {
-            LOGGER.error("Something wrong with file paths", e1);
-        }
-
+        //CDK dependecies method import from Cheminfomatics
+        getmolProperty(sdfFile,Constants.PUBCHEM_COMPOUND_CID,Constants.CHEMSPIDER_CSID,Constants.HMDB_ID,map);
         String newCandidateFilePAth = null;
         newCandidateFilePAth=saveNewCandidateFile(candidateFilePath, map);
+
         if (algorithm.equals(Constants.CFMID)) {
             CFMIDAlgorithm cfm = new CFMIDAlgorithm();
             try {
@@ -110,23 +80,38 @@ public class MsMatchApi {
             outputFilePath="Invalid algorithm selection";
         }
         if (outputFilePath==null){
-             outputFilePath = "Sorry!Something going wrong.";
+            outputFilePath="Sorry!Something going wrong.";
+        }
+
+        CommonClasses getpath = new CommonClasses();
+
+        try {
+            File createdFile=getLatestFilefromDir(outputFilePath);
+            HashMap<String,String>val=getScores(createdFile);
+            addPropertySDF(candidateFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return outPutPath;
     }
 
+    /**
+     *
+     * @param candidateFilePath
+     * @param map
+     * @return
+     */
     private String saveNewCandidateFile(String candidateFilePath, final ConcurrentMap<String, String> map)  {
-        CommonClasses getpath = new CommonClasses();
+
         String newFilePath = null;
-
+        CommonClasses getpath = new CommonClasses();
         try {
-
             newFilePath = getpath.createOutputFileTimeStamp(candidateFilePath);
             java.nio.file.Path newFile = Paths.get(newFilePath);
-
             try(Writer writer = Files.newBufferedWriter(newFile)) {
                 map.forEach((key, value) -> {
-                    try { writer.write(key + DATA_SEPARATOR + value + System.lineSeparator()); }
+                    try { writer.write(key + DATA_SEPARATOR + value + System.lineSeparator());
+                    }
                     catch (IOException ex) {
                         LOGGER.error("Something wrong with candidate file.",ex); }
                 });
@@ -139,16 +124,47 @@ public class MsMatchApi {
         return newFilePath;
     }
 
-    private String generateInChI(IAtomContainer mol)  {
-        String inchi = null;
-        try {
-            InChIGeneratorFactory generator = InChIGeneratorFactory.getInstance();
-            inchi = generator.getInChIGenerator(mol).getInchi();
-        } catch (CDKException e) {
-            LOGGER.error("Something wrong with generating Inchi",e);
+
+
+    /**
+     *
+     * @param inputfile
+     * @return
+     * @throws IOException
+     */
+
+
+    public HashMap<String,String> getScores(File inputfile) throws IOException {
+        HashMap<String, String> map = new HashMap<>();
+        BufferedReader br = new BufferedReader(new FileReader(inputfile));
+        String sCurrentLine;
+        while ((sCurrentLine = br.readLine()) != null) {
+            String parts[] = sCurrentLine.split(" ");
+            map.put(parts[2], parts[1]);
+        }
+        return map;
+
+    }
+
+    /**
+     *
+     * @param dirPath
+     * @return
+     */
+    public File getLatestFilefromDir(String dirPath){
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+        if (files == null || files.length == 0) {
+            return null;
         }
 
-        return inchi;
+        File lastModifiedFile = files[0];
+        for (int i = 1; i < files.length; i++) {
+            if (lastModifiedFile.lastModified() < files[i].lastModified()) {
+                lastModifiedFile = files[i];
+            }
+        }
+        return lastModifiedFile;
     }
 
 }

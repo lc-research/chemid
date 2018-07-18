@@ -1,18 +1,7 @@
-/*
- *  Copyright (c) 2018, LC-Research. (http://www.lc-research.com)
- *
- *  LC-Research licenses this file to you under the Apache License V 2.0.
- *  You may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
- *  Unless required by applicable law or agreed to in writing, software distributed under the
- *  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- *  CONDITIONS OF ANY KIND, either express or implied.  See the License for the
- *  specific language governing permissions and limitations under the License.
- */
-package org.chemid.prefilter.applyFilters;
-
-import org.chemid.prefilter.common.Constants;
-import org.chemid.prefilter.exception.ChemIDPreFilterException;
+package org.chemid.cheminformatics;
+import org.chemid.common.Constants;
+import org.chemid.exception.CheminformaticsException;
+import org.chemid.cheminformatics.Filters;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -35,7 +24,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
-public class CleanUpStructures {
+public class ChemicalStructureManipulator {
+
     private String inputFilePath, keepCompounds, mustContain, savedPath;
     private SDFWriter writer;
     private boolean flag = true;
@@ -46,7 +36,7 @@ public class CleanUpStructures {
     private int molCharge;
     private ConcurrentMap<String, String> map;
 
-    public CleanUpStructures(String inputFilePath, boolean removeDisconnected, boolean removeHeavyIsotopes, boolean removeStereoisomers, String keepCompounds, String mustContain, boolean eliminateCharges, boolean keepPositiveCharges) {
+    public ChemicalStructureManipulator(String inputFilePath, boolean removeDisconnected, boolean removeHeavyIsotopes, boolean removeStereoisomers, String keepCompounds, String mustContain, boolean eliminateCharges, boolean keepPositiveCharges) {
         this.inputFilePath = inputFilePath;
         this.removeDisconnected = removeDisconnected;
         this.removeHeavyIsotopes = removeHeavyIsotopes;
@@ -69,7 +59,7 @@ public class CleanUpStructures {
         }
     }
 
-    public String FilterStructures() throws ChemIDPreFilterException, IOException {
+    public String FilterStructures() throws CheminformaticsException, IOException {
         int index =0;
         index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR_LEFT);
         if (index  <= 0) {
@@ -134,7 +124,7 @@ public class CleanUpStructures {
                     } else {
                         flag = true;
                     }
-                } catch (ChemIDPreFilterException e) {
+                } catch (CheminformaticsException e) {
                     e.printStackTrace();
                 }
                 return flag;
@@ -145,17 +135,17 @@ public class CleanUpStructures {
                 savedPath = Constants.EMPTY_MSG;
             }
         }
+
         return savedPath;
     }
 
     private void createFile(String location2) throws IOException {
         String location = Paths.get(location2).toString();
-        System.out.println(location+"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
         String outputName = new SimpleDateFormat(Constants.SDF_FILE_NAME).format(new Date());
         if (location.endsWith(Constants.LOCATION_SEPARATOR)) {
             savedPath = location + outputName;
         } else {
-            savedPath = location + Constants.LOCATION_SEPARATOR + outputName;
+            savedPath = location + Constants.LOCATION_SEPARATOR_LEFT + outputName;
         }
         File output = new File(savedPath);
         FileWriter fileWriter = new FileWriter(output);
@@ -253,7 +243,7 @@ public class CleanUpStructures {
         return true;
     }
 
-    private boolean removeStereoisomers(IAtomContainer mol, boolean removeStereoisomers) throws ChemIDPreFilterException {
+    private boolean removeStereoisomers(IAtomContainer mol, boolean removeStereoisomers) throws CheminformaticsException {
         String smile = createSmile(mol);
 
         mol.setProperty(Constants.GENERATED_SMILE, smile);
@@ -277,13 +267,13 @@ public class CleanUpStructures {
         return true;
     }
 
-    private String createSmile(IAtomContainer mol) throws ChemIDPreFilterException {
+    private String createSmile(IAtomContainer mol) throws CheminformaticsException {
         SmilesGenerator smileGen = SmilesGenerator.unique();
         String smile;
         try {
             smile = smileGen.create(mol);
         } catch (CDKException e) {
-            throw new ChemIDPreFilterException(e.getMessage(), e);
+            throw new CheminformaticsException(e.getMessage(), e);
         }
         return smile;
     }
@@ -298,4 +288,6 @@ public class CleanUpStructures {
             }
         });
     }
+
+
 }

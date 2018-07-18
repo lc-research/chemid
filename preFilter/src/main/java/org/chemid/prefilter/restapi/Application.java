@@ -40,7 +40,7 @@ public class Application {
         jerseyServlet.setInitOrder(Constants.INIT_ORDER);
         // Tells the Jersey Servlet which REST service/class to load.
         jerseyServlet.setInitParameter("jersey.config.server.provider.classnames",
-                ChemicalPreFilterRESTAPI.class.getCanonicalName());
+                FilterChemicalStructuresRESTAPI.class.getCanonicalName());
         try {
             jettyServer.start();
             jettyServer.join();

@@ -27,6 +27,13 @@
     <version>1.0</version>
     <dependencies>
         <dependency>
+            <groupId>org.chemid</groupId>
+            <artifactId>cheminformatics</artifactId>
+            <version>${cheminformatics.version}</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.stanfy</groupId>
             <artifactId>gson-xml-java</artifactId>
             <version>${gson.xml.version}</version>
@@ -43,7 +50,7 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
+       <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
@@ -70,7 +77,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.chemid.msmatch.restApi.Application</Main-Class>
+                                        <Main-Class>org.chemid.msmatch.restapi.Application</Main-Class>
                                     </manifestEntries>
                                 </transformer>
 
@@ -93,5 +100,6 @@
     <properties>
         <mvn.shade.version>2.4.1</mvn.shade.version>
         <gson.xml.version>0.1.7</gson.xml.version>
+        <cheminformatics.version>1.0</cheminformatics.version>
     </properties>
 </project>

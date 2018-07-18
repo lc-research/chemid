@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~  Copyright (c) 2018, LC-Research. (http://www.lc-research.com)
@@ -25,6 +26,13 @@
     <artifactId>prefilter</artifactId>
     <version>1.0</version>
     <dependencies>
+        <dependency>
+            <groupId>org.chemid</groupId>
+            <artifactId>cheminformatics</artifactId>
+            <version>${cheminformatics.version}</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.stanfy</groupId>
             <artifactId>gson-xml-java</artifactId>
@@ -77,5 +85,6 @@
     <properties>
         <mvn.shade.version>2.4.1</mvn.shade.version>
         <gson.xml.version>0.1.7</gson.xml.version>
+        <cheminformatics.version>1.0</cheminformatics.version>
     </properties>
 </project>

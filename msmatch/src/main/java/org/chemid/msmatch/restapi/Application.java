@@ -10,7 +10,7 @@
  *  specific language governing permissions and limitations under the License.
  */
 
-package org.chemid.msmatch.restApi;
+package org.chemid.msmatch.restapi;
 
 import org.chemid.msmatch.common.Constants;
 import org.eclipse.jetty.server.Server;
