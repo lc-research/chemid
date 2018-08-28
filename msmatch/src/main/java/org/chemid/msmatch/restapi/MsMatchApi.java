@@ -88,7 +88,7 @@ public class MsMatchApi {
         try {
             File createdFile=getLatestFilefromDir(outputFilePath);
             HashMap<String,String>val=getScores(createdFile);
-            addPropertySDF(candidateFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath));
+            addPropertySDF(candidateFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath),"CFMIDScore");
         } catch (IOException e) {
             e.printStackTrace();
         }

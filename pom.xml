@@ -24,6 +24,7 @@
         <module>structure</module>
         <module>msmatch</module>
         <module>cheminformatics</module>
+        <module>id</module>
     </modules>
     <dependencies>
         <dependency>
