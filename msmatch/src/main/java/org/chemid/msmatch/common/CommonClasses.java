@@ -13,8 +13,6 @@
 package org.chemid.msmatch.common;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
@@ -32,7 +30,11 @@ public class CommonClasses {
         return newFilePath;
     }
 
-
+    /** Genarate MsMatch output SD File name
+     *
+     * @param ouputSDFpath
+     * @return String of output SD File
+     */
    public String createMsMatchOuputSDF(String ouputSDFpath){
        int index = ouputSDFpath.lastIndexOf('/');
        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
