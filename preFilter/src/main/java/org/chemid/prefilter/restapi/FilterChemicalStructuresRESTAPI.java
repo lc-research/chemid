@@ -13,18 +13,13 @@
 package org.chemid.prefilter.restapi;
 
 
-
-import org.chemid.cheminformatics.ChemicalStructureManipulator;
 import org.chemid.prefilter.common.Constants;
 import org.chemid.cheminformatics.Filters;
-//import static org.chemid.cheminformatics.ChemicalStructureManipulator.filterChemStructures;
+import static org.chemid.cheminformatics.ChemicalStructureManipulator.Structures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Objects;
 
@@ -35,7 +30,29 @@ import java.util.Objects;
 @Path("/rest/filter")
 public class FilterChemicalStructuresRESTAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterChemicalStructuresRESTAPI.class);
+    /**
+     *  This method returns the version number of the preFilter service.
+     * @return API Version
+     */
+    @GET
+    @Path("/version")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String version() {
+        return "preFilter Service V 1.0";
+    }
 
+    /**
+     *
+     * @param inputFilePath : File Path to Input SD File
+     * @param removeDisconnected : Whether to remove disconnected structures or not
+     * @param removeHeavyIsotopes : Whether to remove heavy isotopes or not
+     * @param removeStereoisomers : Whether to remove stereoisomers or not
+     * @param keepCompounds : User specified set of elements
+     * @param mustContain : User specified set of elements
+     * @param eliminateCharges : Whether to remove charged structures
+     * @param keepPositiveCharges : Whether to remove neutral or negatively charged structures
+     * @return String of saved path
+     */
     @POST
     @Path("doFilters")
     @Produces(MediaType.TEXT_HTML)
@@ -49,12 +66,15 @@ public class FilterChemicalStructuresRESTAPI {
             @FormParam("eliminate_overall_charges") boolean eliminateCharges,
             @FormParam("keep_positive_charges") boolean keepPositiveCharges) {
         String savedPath = null;
+
         try {
             if (Objects.equals(inputFilePath, "") || inputFilePath == null) {
                 savedPath = Constants.FILE_PATH_EMPTY;
             } else {
-                ChemicalStructureManipulator filter = new ChemicalStructureManipulator(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
-                savedPath = filter.FilterStructures();
+
+                Filters filters=new Filters(inputFilePath, removeDisconnected, removeHeavyIsotopes, removeStereoisomers, keepCompounds, mustContain, eliminateCharges, keepPositiveCharges);
+                savedPath =Structures(filters);
+
             }
         } catch (Exception e) {
             LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG_PREFILTER, e);
