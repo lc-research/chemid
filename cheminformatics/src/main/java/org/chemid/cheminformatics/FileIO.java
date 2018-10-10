@@ -16,25 +16,17 @@ import org.chemid.common.Constants;
 import static org.chemid.common.CommonClass.createOuputSDF;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.graph.ConnectivityChecker;
 import org.openscience.cdk.inchi.InChIGeneratorFactory;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
-import org.openscience.cdk.smiles.SmilesGenerator;
-import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FileIO {
@@ -52,7 +44,7 @@ public class FileIO {
     }
 
 
-    /**
+    /** Filter Bundled SD File By Mass
      *
      * @param pathToInputSDF File Path to Input SD File
      * @param pathToOutputSDF File Path to Output SD File
@@ -101,10 +93,10 @@ public class FileIO {
 
     //**********************************************MsMatch Module***************************************************************************
 
-    /**
+    /** Create Inchi for Molecules
      *
-     * @param mol
-     * @return
+     * @param mol IAtomContainer Molecule
+     * @return Inchi of a Molecule
      */
     public static String generateInChI(IAtomContainer mol)  {
         String inchi = null;
@@ -118,13 +110,13 @@ public class FileIO {
         return inchi;
     }
 
-    /**
+    /** Get Molecule Property use in MSMatchAPI
      *
-     * @param sdfFile
-     * @param pubchemCID
-     * @param chemspiderCSID
-     * @param hmdbID
-     * @param map
+     * @param sdfFile : File Path to Input SD File
+     * @param pubchemCID : ID of PubChem SD File
+     * @param chemspiderCSID : ID of Chemspider SD File
+     * @param hmdbID : ID of Chemspider HMDB SD File
+     * @param map : Hashmap with key ID and Value Inchi
      */
         public static void getmolProperty(File sdfFile,String pubchemCID,String chemspiderCSID,String hmdbID, ConcurrentMap<String, String> map) {
             IteratingSDFReader reader = null;
@@ -159,16 +151,17 @@ public class FileIO {
                 }
 
 
-            } catch (FileNotFoundException e1) {
-               LOGGER.error("Something wrong with file paths",e1);
+            } catch (FileNotFoundException e) {
+               LOGGER.error("Something wrong with file paths",e);
             }
         }
 
-    /**
+    /** Add new Property to a SD File
      *
-      * @param inputpathsdf
-     * @param scorevalues
-     * @param outputpathsdf
+     * @param inputpathsdf : File Path to Input SD File
+     * @param scorevalues : Hashmap with key(id) and value
+     * @param outputpathsdf : File Path to Output SD File
+     * @param propertyName : New Property name
      * @throws IOException
      */
     public static void addPropertySDF(String inputpathsdf, HashMap<String,String> scorevalues, String outputpathsdf,String propertyName) throws IOException {
@@ -209,22 +202,22 @@ public class FileIO {
 
     //***********************************************ID Module***************************************************************************
 
-    /**
+    /** Calculate Average Weight from RI,CCS,ECOM50 and CFMID values
      *
-     * @param inputSDF
-     * @param expRI
-     * @param expECOM50
-     * @param expCCS
-     * @param expCFMID
-     * @param weightRI
-     * @param weightECOM50
-     * @param weightCCS
-     * @param weightCFMID
-     * @param ri
-     * @param ecom
-     * @param ccs
-     * @param cfmid
-     * @return
+     * @param inputSDF : File Path to Input SD File
+     * @param expRI : experimental RI value
+     * @param expECOM50 : experimental ECOM50 value
+     * @param expCCS : experimental CCS value
+     * @param expCFMID : experimental CFMID value
+     * @param weightRI : RI weight
+     * @param weightECOM50 : ECOM50 weight
+     * @param weightCCS : CCS weight
+     * @param weightCFMID : CFMID weight
+     * @param ri : (Boolean)Keep or Remove RI Weight
+     * @param ecom : (Boolean)Keep or Remove ECOM50 Weight
+     * @param ccs : (Boolean)Keep or Remove CCS Weight
+     * @param cfmid : (Boolean)Keep or Remove CFMID Weight
+     * @return String of Average Weight Update
      * @throws IOException
      */
     public static String calWeightProperty(String inputSDF,double expRI,double expECOM50,double expCCS,double expCFMID,
@@ -307,26 +300,22 @@ public class FileIO {
     }
 
 
-
-
-
-
-    /**
+    /** Keep or Remove RI,ECOm50,CCS & CFMID and Calculate Average Weight
      *
-     * @param valRI
-     * @param valECOM
-     * @param valCCS
-     * @param valCFMID
-     * @param molId
-     * @param weightRI
-     * @param weightECOM50
-     * @param weightCCS
-     * @param weightCFMID
-     * @param ri
-     * @param ecom
-     * @param ccs
-     * @param cfmid
-     * @return
+     * @param valRI RI values List
+     * @param valECOM ECOM50 values List
+     * @param valCCS CCS values List
+     * @param valCFMID CFMID values List
+     * @param molId Molucle Ids List
+     * @param weightRI RI weight
+     * @param weightECOM50 ECOM50 weight
+     * @param weightCCS CCS weight
+     * @param weightCFMID CFMID weight
+     * @param ri Boolean RI
+     * @param ecom Boolean ECOM50
+     * @param ccs Boolean CCS
+     * @param cfmid Boolean CFMID
+     * @return Double List of Average Weights
      */
 
     public static List<Double> calWeightAverage(List<Double>valRI,List<Double>valECOM,List<Double>valCCS,List<Double>valCFMID,List<String> molId,
@@ -380,13 +369,12 @@ public class FileIO {
     }
 
 
-
-    /**
+    /**Caculate Weight in Range of (0-1)
      *
-     * @param values
-     * @param weight
-     * @param keepWeight
-     * @return
+     * @param values : RI/CFMID/ECOM50/CCS values list
+     * @param weight : Input weights of RI/CFMID/ECOM50/CCS
+     * @param keepWeight : Keep or remove weight
+     * @return : Double list of Weights
      */
 
     public static List<Double> calculateWeight(List<Double>values,double weight,boolean keepWeight){
@@ -409,12 +397,6 @@ public class FileIO {
 
         return tempWeight;
     }
-
-   
-
-
-
-
 
 
 }
