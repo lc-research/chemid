@@ -1,7 +1,19 @@
+/*
+ *  Copyright (c) 2018, LC-Research. (http://www.lc-research.com)
+ *
+ *  LC-Research licenses this file to you under the Apache License V 2.0.
+ *  You may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
+ *  Unless required by applicable law or agreed to in writing, software distributed under the
+ *  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ *  CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations under the License.
+ */
+
+
 package org.chemid.cheminformatics;
 import org.chemid.common.Constants;
 import org.chemid.exception.CheminformaticsException;
-import org.chemid.cheminformatics.Filters;
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.graph.ConnectivityChecker;
@@ -10,183 +22,216 @@ import org.openscience.cdk.io.SDFWriter;
 import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
-
+import static org.chemid.common.CommonClass.generateOutputFileName;
 import java.io.*;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/**
+ *  This Class includes filtering methods for molecules
+ */
 
 public class ChemicalStructureManipulator {
 
-    private String inputFilePath, keepCompounds, mustContain, savedPath;
-    private SDFWriter writer;
-    private boolean flag = true;
-    private int k = 0;
+    public static ConcurrentMap<String, String> map;
+    public static int molCharge;
 
-    private boolean removeDisconnected, removeHeavyIsotopes, removeStereoisomers, eliminateCharges, keepPositiveCharges;
-    private List<String> keepCompoundsWith, compoundsMustContain;
-    private int molCharge;
-    private ConcurrentMap<String, String> map;
+    private ChemicalStructureManipulator(){
 
-    public ChemicalStructureManipulator(String inputFilePath, boolean removeDisconnected, boolean removeHeavyIsotopes, boolean removeStereoisomers, String keepCompounds, String mustContain, boolean eliminateCharges, boolean keepPositiveCharges) {
-        this.inputFilePath = inputFilePath;
-        this.removeDisconnected = removeDisconnected;
-        this.removeHeavyIsotopes = removeHeavyIsotopes;
-        this.removeStereoisomers = removeStereoisomers;
-        this.eliminateCharges = eliminateCharges;
-        this.keepCompounds = keepCompounds;
-        this.mustContain = mustContain;
-        this.keepPositiveCharges = keepPositiveCharges;
-        map = new ConcurrentHashMap<>();
-        if (keepCompounds.length() > 0) {
-            keepCompoundsWith = new ArrayList<>(Arrays.asList(keepCompounds.split(",")));
-        } else {
-            keepCompoundsWith = new ArrayList<>();
-        }
-        if (mustContain.length() > 0) {
-            compoundsMustContain = new ArrayList<>(Arrays.asList(mustContain.split(",")));
-            compoundsMustContain.replaceAll(String::toUpperCase);
-        } else {
-            compoundsMustContain = new ArrayList<>();
-        }
     }
 
-    public String FilterStructures() throws CheminformaticsException, IOException {
-        int index =0;
-        index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR_LEFT);
-        if (index  <= 0) {
-            index = inputFilePath.lastIndexOf(Constants.LOCATION_SEPARATOR);
+
+    /**preFilter Module
+     *
+     * @param filters import from Filter Class
+     * @return String of sdf file updated or not
+     * @throws CheminformaticsException
+     * @throws IOException
+     */
+
+    public static String Structures(Filters filters) throws CheminformaticsException, IOException {
+
+        if(filters.inputFilePath==null){
+
+            return Constants.FILE_NOT_FOUND;
+
         }
 
-        createFile(inputFilePath.substring(0, index));
-        File sdfFile = new File(inputFilePath);
-        if (!sdfFile.exists()) {
-            savedPath = Constants.FILE_NOT_FOUND;
-        } else {
-            Iterable<IAtomContainer> iterable = getIterables(sdfFile);
-            Stream<IAtomContainer> stream = StreamSupport.stream(iterable.spliterator(), true).filter(mol -> {
-                if (!removeDisconnectedStructures(removeDisconnected, mol)) {
-                    return false;
-                } else {
-                    flag = true;
-                }
-                if (!removeHeavyIsotopes(mol, removeHeavyIsotopes)) {
-                    return false;
-                } else {
-                    flag = true;
-                }
-                if (keepCompoundsWith.size() > 0) {
-                    if (!keepThisCompounds(keepCompoundsWith, mol)) {
-                        return false;
+        else {
+
+            try {
+                String outputpath = (generateOutputFileName(filters.inputFilePath));
+                SDFWriter sdfWriter = new SDFWriter(new FileWriter(new File(outputpath)));
+                IteratingSDFReader sdfReader = new IteratingSDFReader(new FileInputStream(filters.inputFilePath), DefaultChemObjectBuilder.getInstance());
+                Iterable<IAtomContainer> iterables = () -> sdfReader;
+                StreamSupport.stream(iterables.spliterator(), true).filter(iAtomContainer ->
+                        {
+                            if (filters.removeDisconnected || ConnectivityChecker.isConnected(iAtomContainer)) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                ).filter(iAtomContainer -> {
+
+                    if (filters.removeHeavyIsotopes) {
+                        if (iAtomContainer.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT) != null) {
+                            if (Integer.parseInt(iAtomContainer.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT).toString()) > 0) {
+                                return true;
+                            }
+                        }
+                        return true;
+
                     } else {
-                        flag = true;
-                    }
-                } else {
-                    flag = true;
-                }
-                if (compoundsMustContain.size() > 0) {
-                    if (!compoundsMustContain(compoundsMustContain, mol)) {
+
                         return false;
-                    } else {
-                        flag = true;
                     }
-                } else {
-                    flag = true;
-                }
-                if (keepPositiveCharges || eliminateCharges) {
-                    molCharge = AtomContainerManipulator.getTotalFormalCharge(mol);
-                    if (keepPositiveCharges) {
-                        if (molCharge > 0) {
-                            flag = true;
-                        } else {
-                            return false;
+
+
+                }).filter(iAtomContainer -> {
+                    if (filters.keepCompoundsWith.size() > 0) {
+                        if (keepCompounds(filters.keepCompoundsWith, iAtomContainer)) {
+                            return true;
                         }
 
-                    } else if (eliminateCharges) {
-                        if (molCharge == 0) {
-                            flag = true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-                try {
-                    if (!removeStereoisomers(mol, removeStereoisomers)) {
-                        return false;
+                        return true;
                     } else {
-                        flag = true;
+                        return false;
                     }
-                } catch (CheminformaticsException e) {
-                    e.printStackTrace();
+
+                }).filter((iAtomContainer -> {
+                    if (filters.compoundsMustContain.size() > 0) {
+                        if (compoundsMustContain(filters.compoundsMustContain, iAtomContainer)) {
+                            return true;
+                        }
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+
+                }))
+                        .filter((iAtomContainer -> {
+
+                            if (filters.keepPositiveCharges || filters.eliminateCharges) {
+                                molCharge = AtomContainerManipulator.getTotalFormalCharge(iAtomContainer);
+                                System.out.println(molCharge);
+                                if (filters.keepPositiveCharges) {
+                                    if (molCharge > 0) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+
+                                } else if (filters.eliminateCharges) {
+                                    if (molCharge == 0) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        })).forEach(filteredIAtomContainer -> {
+                    try {
+                        sdfWriter.write(filteredIAtomContainer);
+                    } catch (CDKException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                sdfWriter.close();
+                sdfReader.close();
+
+                if (filters.removeStereoisomers) {
+
+                    updateSterioIsomers(outputpath);
                 }
-                return flag;
-            });
-            writeToFile(stream);
-
-            if (k == 0) {
-                savedPath = Constants.EMPTY_MSG;
-            }
-        }
-
-        return savedPath;
-    }
-
-    private void createFile(String location2) throws IOException {
-        String location = Paths.get(location2).toString();
-        String outputName = new SimpleDateFormat(Constants.SDF_FILE_NAME).format(new Date());
-        if (location.endsWith(Constants.LOCATION_SEPARATOR)) {
-            savedPath = location + outputName;
-        } else {
-            savedPath = location + Constants.LOCATION_SEPARATOR_LEFT + outputName;
-        }
-        File output = new File(savedPath);
-        FileWriter fileWriter = new FileWriter(output);
-        writer = new SDFWriter(fileWriter);
-
-    }
-
-    private Iterable<IAtomContainer> getIterables(File sdfFile) {
-        Iterable<IAtomContainer> iterables = null;
-        IteratingSDFReader reader;
-
-        try {
-            reader = new IteratingSDFReader(
-                    new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
-            final IteratingSDFReader finalReader = reader;
-            iterables = () -> finalReader;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return iterables;
-    }
-
-    private boolean removeDisconnectedStructures(boolean removeDisconnected, IAtomContainer mol) {
-        return !removeDisconnected || ConnectivityChecker.isConnected(mol);
-    }
-
-    private boolean removeHeavyIsotopes(IAtomContainer mol, boolean removeHeavyIsotopes) {
-        if (removeHeavyIsotopes) {
-            if (mol.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT) != null) {
-                if (Integer.parseInt(mol.getProperty(Constants.PUBCHEM_ISOTOPIC_ATOM_COUNT).toString()) > 0) {
-                    return false;
-                }
-            } else {
-                return true;
+            } catch (IOException | RuntimeException e) {
+                throw new RuntimeException(e);
             }
 
+
+            return Constants.PROPERTY_UPDATED;
         }
-        return true;
     }
 
-    private boolean keepThisCompounds(List<String> keepCompoundsWith, IAtomContainer mol) {
+    /**Update Sterio Isomers
+     *
+     * @param inputSDF File Path to Input SD File
+     */
+    private static void updateSterioIsomers(String inputSDF){
+        File sdfFile = new File(inputSDF);
+        IteratingSDFReader sdfReader =null;
+        HashMap<String, String> hashMap = new HashMap<>();
+
+
+            try {
+
+                sdfReader = new IteratingSDFReader(new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
+                while (sdfReader.hasNext()) {
+                    IAtomContainer molecule = (IAtomContainer) sdfReader.next();
+
+                    String hmdb_ID = (String) (molecule.getProperty(Constants.HMDB_ID));
+                    String cs_ID = (String) (molecule.getProperty(Constants.CHEMSPIDER_CSID));
+                    String pubchem_ID = (String) (molecule.getProperty(Constants.PUBCHEM_COMPOUND_CID));
+                    String uniquesmile = createSmile(molecule);
+                    String id = null;
+
+                    if (cs_ID == null && pubchem_ID == null) {
+                        id = hmdb_ID;
+                    } else if (cs_ID == null && hmdb_ID == null) {
+                        id = pubchem_ID;
+                    } else if (pubchem_ID == null && hmdb_ID == null) {
+                        id = cs_ID;
+                    }
+
+                    if (hashMap.containsKey(uniquesmile)) {
+                        hashMap.put(uniquesmile, hashMap.get(uniquesmile) + "," + id);
+                    } else {
+                        hashMap.put(uniquesmile, id);
+                    }
+
+
+                }
+
+                sdfReader.close();
+
+                sdfReader = new IteratingSDFReader(new FileInputStream(sdfFile), DefaultChemObjectBuilder.getInstance());
+                SDFWriter sdfWriter = new SDFWriter(new FileWriter(generateOutputFileName(inputSDF)));
+                while (sdfReader.hasNext()) {
+
+                    IAtomContainer molecule = (IAtomContainer) sdfReader.next();
+                    String uniquesmile = createSmile(molecule);
+
+                    if (hashMap.containsKey(uniquesmile)) {
+                        molecule.setProperty("SterioIsomers", hashMap.get(uniquesmile));
+                        sdfWriter.write(molecule);
+                        hashMap.remove(uniquesmile);
+                    }
+
+
+                }
+
+
+                sdfWriter.close();
+                sdfReader.close();
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+    }
+
+    /**Get the atoms of IAtomContainer and keep the compound by matching with array
+     *
+     * @param keepCompoundsWith : Compunds Array List
+     * @param mol : Molecule from SD File
+     * @return : boolean of KeepCompounds
+     */
+    private static boolean keepCompounds(List<String> keepCompoundsWith, IAtomContainer mol) {
         if (keepCompoundsWith.size() == 0) {
             return true;
         }
@@ -212,7 +257,13 @@ public class ChemicalStructureManipulator {
         return hasFlag;
     }
 
-    private boolean compoundsMustContain(List<String> compoundsMustContain, IAtomContainer mol) {
+    /**
+     *
+     * @param compoundsMustContain Compunds Array List
+     * @param mol : Molecule from sdf File
+     * @return : boolean of KeepCompounds
+     */
+    private static boolean compoundsMustContain(List<String> compoundsMustContain, IAtomContainer mol) {
         if (compoundsMustContain.size() == 0) {
             return true;
         }
@@ -230,7 +281,13 @@ public class ChemicalStructureManipulator {
         }
     }
 
-    private boolean getEqualLists(List<String> list1, List<String> list2) {
+    /** Get Equals from Compounds Array and Molecule Array
+     *
+     * @param list1 : Compunds Array List
+     * @param list2 : Molecule Array List
+     * @return
+     */
+    private static boolean getEqualLists(List<String> list1, List<String> list2) {
         if (list1 == null && list2 == null)
             return false;
         if (list2 == null)
@@ -243,31 +300,14 @@ public class ChemicalStructureManipulator {
         return true;
     }
 
-    private boolean removeStereoisomers(IAtomContainer mol, boolean removeStereoisomers) throws CheminformaticsException {
-        String smile = createSmile(mol);
+    /**Create Smiles for molecules
+     *
+     * @param mol : Molecule from SD File
+     * @return : String Smile
+     * @throws CheminformaticsException
+     */
 
-        mol.setProperty(Constants.GENERATED_SMILE, smile);
-        if (removeStereoisomers) if (map != null) {
-            if (map.containsKey(smile)) {
-                return false;
-            } else {
-                if (mol.getProperty(Constants.PUBCHEM_COMPOUND_CID) != null) {
-                    map.put(smile, mol.getProperty(Constants.PUBCHEM_COMPOUND_CID));
-                } else if (mol.getProperty(Constants.CHEMSPIDER_CSID) != null) {
-                    map.put(smile, mol.getProperty(Constants.CHEMSPIDER_CSID));
-                } else if (mol.getProperty(Constants.HMDB_ID) != null) {
-                    map.put(smile, mol.getProperty(Constants.HMDB_ID));
-                }
-                return true;
-            }
-
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private String createSmile(IAtomContainer mol) throws CheminformaticsException {
+    private static String createSmile(IAtomContainer mol) throws CheminformaticsException {
         SmilesGenerator smileGen = SmilesGenerator.unique();
         String smile;
         try {
@@ -275,18 +315,8 @@ public class ChemicalStructureManipulator {
         } catch (CDKException e) {
             throw new CheminformaticsException(e.getMessage(), e);
         }
-        return smile;
-    }
 
-    private void writeToFile(Stream<IAtomContainer> stream) {
-        stream.forEach(item -> {
-            try {
-                k++;
-                writer.write(item);
-            } catch (CDKException | RuntimeException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        return smile;
     }
 
 

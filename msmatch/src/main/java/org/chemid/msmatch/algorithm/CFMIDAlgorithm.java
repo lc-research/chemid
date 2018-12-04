@@ -15,16 +15,24 @@ package org.chemid.msmatch.algorithm;
 import org.chemid.msmatch.common.CommonClasses;
 import org.chemid.msmatch.common.Constants;
 import org.chemid.msmatch.exception.ChemIDMsMatchException;
-
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 
 
 import static org.chemid.msmatch.common.Constants.OUTPUT_WRITE_ERROR;
 
 public class CFMIDAlgorithm {
-
+    /**
+     *
+     * @param candidateFilePath : File Path to Input SD File
+     * @param spectrumFilePath : File Path to Spectrum File
+     * @param ppmMassTollerence : Mass tolerance in ppm
+     * @param absMassTollerence : Absolute mass tolerance in Daltons
+     * @param problemThreshold : Probability below unlikely fragmentations are pruned
+     * @param scoreType  : Scoring function for comparing spectra. Options: Jaccard,DotProduct.
+     * @param outputFilePath : File Path to Output SD File
+     * @return : String of Output File Path
+     * @throws ChemIDMsMatchException
+     */
     public String rankstructures(String candidateFilePath, String spectrumFilePath, double ppmMassTollerence, double absMassTollerence, double problemThreshold, String scoreType, String outputFilePath) throws ChemIDMsMatchException {
         File candidateFile = new File(candidateFilePath);
         File spectrumFile = new File(spectrumFilePath);

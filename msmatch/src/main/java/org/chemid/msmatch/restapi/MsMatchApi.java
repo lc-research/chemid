@@ -12,21 +12,15 @@
 
 package org.chemid.msmatch.restapi;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
+
 import org.chemid.msmatch.algorithm.CFMIDAlgorithm;
 import org.chemid.msmatch.common.CommonClasses;
 import org.chemid.msmatch.common.Constants;
 import org.chemid.msmatch.exception.ChemIDMsMatchException;
-import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.inchi.InChIGeneratorFactory;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.io.iterator.IteratingSDFReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.chemid.cheminformatics.FileIO.addPropertySDF;
 import static org.chemid.cheminformatics.FileIO.getmolProperty;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.*;
@@ -38,10 +32,17 @@ import java.util.concurrent.ConcurrentMap;
 
 import static org.chemid.msmatch.common.Constants.DATA_SEPARATOR;
 
+/**
+ *  This class includes RESTful API methods for MsMatch service
+ */
 @Path("/rest/msmatch")
 public class MsMatchApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(MsMatchApi.class);
 
+    /**
+     *  This method returns the version number of the MsMatch service.
+     * @return API Version
+     */
     @GET
     @Path("/version")
     @Produces(MediaType.TEXT_PLAIN)
@@ -49,6 +50,18 @@ public class MsMatchApi {
         return "ms-match Service V 1.0";
     }
 
+    /**
+     *
+     * @param candidateFilePath : File Path to Input SD File
+     * @param spectrumFilePath : File Path to Spectrum File
+     * @param ppmMassTollerence : Mass tolerance in ppm
+     * @param absMassTollerence : Absolute mass tolerance in Daltons
+     * @param problemThreshold : Probability below unlikely fragmentations are pruned
+     * @param scoreType : Scoring function for comparing spectra. Options: Jaccard,DotProduct.
+     * @param outputFilePath : File Path to Output SD File
+     * @param algorithm mass spectra simulator – CFM-ID
+     * @return String of output path
+     */
     @POST
     @Path("/rank")
     @Produces(MediaType.TEXT_HTML)
@@ -126,10 +139,10 @@ public class MsMatchApi {
 
 
 
-    /**
+    /** Get Scores from Text file and store in Hashmap
      *
-     * @param inputfile
-     * @return
+     * @param inputfile : File path to input text file
+     * @return String Hashmap with ID key and CFMID score value
      * @throws IOException
      */
 
@@ -146,8 +159,7 @@ public class MsMatchApi {
 
     }
 
-    /**
-     *
+    /** Get the Last Created SD File from Time Stamps
      * @param dirPath
      * @return
      */
