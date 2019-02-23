@@ -398,5 +398,21 @@ public class FileIO {
         return tempWeight;
     }
 
+    //***********************************************Filter Module***************************************************************************
+
+    public static  HashMap<String,String> getFilterValues(String inputfile,double inputvalue,double error) throws IOException {
+        HashMap<String, String> map = new HashMap<>();
+        double upperbound=inputvalue+error;
+        double lowerbound=inputvalue-error;
+        BufferedReader br = new BufferedReader(new FileReader(inputfile));
+        String sCurrentLine;
+        while ((sCurrentLine = br.readLine()) != null) {
+            String parts[] = sCurrentLine.split(",");
+            map.put(parts[0], parts[1]);
+        }
+        map.values().removeIf(value->(Double.parseDouble(value)>upperbound || Double.parseDouble(value)<lowerbound));
+        return map;
+
+    }
 
 }

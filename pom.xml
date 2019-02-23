@@ -25,6 +25,7 @@
         <module>msmatch</module>
         <module>cheminformatics</module>
         <module>id</module>
+        <module>filter</module>
     </modules>
     <dependencies>
         <dependency>
@@ -68,6 +69,7 @@
             <artifactId>cdk-bundle</artifactId>
             <version>${cdk.version}</version>
         </dependency>
+
     </dependencies>
     <properties>
         <jetty.version>9.3.2.v20150730</jetty.version>
