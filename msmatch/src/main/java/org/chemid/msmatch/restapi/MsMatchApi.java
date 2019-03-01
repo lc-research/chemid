@@ -66,13 +66,13 @@ public class MsMatchApi {
     @Path("/rank")
     @Produces(MediaType.TEXT_HTML)
     public String rankCandidate(
-            @FormParam("candidate_file_path") String candidateFilePath,
-            @FormParam("spectrum_file_path") String spectrumFilePath,
-            @FormParam("ppm_mass_tol") double ppmMassTollerence,
-            @FormParam("abs_mass_tol") double absMassTollerence,
-            @FormParam("prob_thresh") double problemThreshold,
+            @FormParam("candidateFilePath") String candidateFilePath,
+            @FormParam("spectrumFilePath") String spectrumFilePath,
+            @FormParam("ppmMassTollerence") double ppmMassTollerence,
+            @FormParam("absMassTollerence") double absMassTollerence,
+            @FormParam("problemThreshold") double problemThreshold,
             @FormParam("score_type") String scoreType,
-            @FormParam("output_file_path") String outputFilePath,
+            @FormParam("outputFilePath") String outputFilePath,
             @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
         File sdfFile = new File(candidateFilePath);

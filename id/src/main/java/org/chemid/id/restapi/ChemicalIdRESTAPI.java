@@ -63,19 +63,19 @@ public class ChemicalIdRESTAPI {
     @Path("/property")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
-                @FormParam("input_sdf_path") String inputSDFpath,
-                @FormParam("experimental_ri") double valueRI,
-                @FormParam("experimental_ecom50") double valueECOM50,
-                @FormParam("experimental_ccs") double valueCCS,
-                @FormParam("exprimnetal_cfmid")double valueCFMID,
-                @FormParam("ri_weight")double weightRI,
-                @FormParam("ecom50_weight")double weightECOM50,
-                @FormParam("ccs_weight")double weightCCS,
-                @FormParam("cfmid_weight")double weightCFMID,
-                @FormParam("keep_ri_weight")boolean keepweightRI,
-                @FormParam("keep_ecom50_weight")boolean keepweightECOM50,
-                @FormParam("keep_ccs_weight")boolean keepweightCCS,
-                @FormParam("keep_cfmid_weight")boolean keepweightCFMID
+                @FormParam("inputSDFpath") String inputSDFpath,
+                @FormParam("experimentalRI") double valueRI,
+                @FormParam("experimentalECOM50") double valueECOM50,
+                @FormParam("experimentalCCS") double valueCCS,
+                @FormParam("exprimnetalCFMID")double valueCFMID,
+                @FormParam("weightRI")double weightRI,
+                @FormParam("weightECOM50")double weightECOM50,
+                @FormParam("weightCCS")double weightCCS,
+                @FormParam("weightCFMID")double weightCFMID,
+                @FormParam("keepRIWeight")boolean keepweightRI,
+                @FormParam("keepECOM50Weight")boolean keepweightECOM50,
+                @FormParam("keepCCSweight")boolean keepweightCCS,
+                @FormParam("keepCFMIDweight")boolean keepweightCFMID
     ) throws IOException {
 
         String outPutPath = null;

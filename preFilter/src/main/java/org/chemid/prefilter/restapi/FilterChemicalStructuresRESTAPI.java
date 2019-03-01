@@ -27,7 +27,7 @@ import java.util.Objects;
  * This class includes RESTful API methods for chemical structure pre filter.
  */
 
-@Path("/rest/filter")
+@Path("/rest/prefilter")
 public class FilterChemicalStructuresRESTAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(FilterChemicalStructuresRESTAPI.class);
     /**
@@ -54,17 +54,17 @@ public class FilterChemicalStructuresRESTAPI {
      * @return String of saved path
      */
     @POST
-    @Path("doFilters")
+    @Path("applyfilters")
     @Produces(MediaType.TEXT_HTML)
     public String removeIrrelevantStructures(
-            @FormParam("input_file_path") String inputFilePath,
-            @FormParam("remove_disconnected_structures") boolean removeDisconnected,
-            @FormParam("remove_heavy_isotopes") boolean removeHeavyIsotopes,
-            @FormParam("remove_stereoisomers") boolean removeStereoisomers,
-            @FormParam("keep_compounds") String keepCompounds,
-            @FormParam("compound_must_contain") String mustContain,
-            @FormParam("eliminate_overall_charges") boolean eliminateCharges,
-            @FormParam("keep_positive_charges") boolean keepPositiveCharges) {
+            @FormParam("inputFilePath") String inputFilePath,
+            @FormParam("removeDisconnectedStructures") boolean removeDisconnected,
+            @FormParam("removeHeavyIsotopes") boolean removeHeavyIsotopes,
+            @FormParam("removeStereoisomers") boolean removeStereoisomers,
+            @FormParam("keepCompounds") String keepCompounds,
+            @FormParam("compoundMustContain") String mustContain,
+            @FormParam("eliminateOverallCharges") boolean eliminateCharges,
+            @FormParam("keepPositiveCharges") boolean keepPositiveCharges) {
         String savedPath = null;
 
         try {
