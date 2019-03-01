@@ -46,11 +46,11 @@ public class FilterRESTAPI {
     @Path("/filterProperty")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
-                @FormParam("input_sdf_path") String inputSDFpath,
-                @FormParam("input_file_path") String inputFilepath,
-                @FormParam("experimental_value") double experinmentalValue,
+                @FormParam("inputSDFpath") String inputSDFpath,
+                @FormParam("inputFilepath") String inputFilepath,
+                @FormParam("experinmentalValue") double experinmentalValue,
                 @FormParam("error") double error,
-                @FormParam("property_name")String propertyName
+                @FormParam("propertyName")String propertyName
 
     ) throws IOException {
         CommonClass getpath = new CommonClass();
