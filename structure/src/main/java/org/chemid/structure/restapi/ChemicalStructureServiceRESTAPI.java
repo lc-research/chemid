@@ -12,8 +12,10 @@
 
 package org.chemid.structure.restapi;
 
+import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import org.chemid.structure.common.Constants;
 import org.chemid.structure.dbclient.chemspider.ChemSpiderClient;
+import org.chemid.structure.dbclient.chemspider.ChemSpiderClientService;
 import org.chemid.structure.dbclient.hmdb.HMDBClient;
 import org.chemid.structure.dbclient.hmdb.utilities.HMDBTools;
 import org.chemid.structure.dbclient.pubchem.PubChemClient;
@@ -24,9 +26,11 @@ import org.chemid.structure.exception.ChemIDStructureException;
 import org.openscience.cdk.exception.CDKException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.Locale;
 
@@ -80,25 +84,31 @@ public class ChemicalStructureServiceRESTAPI {
                     PubChemESearch pubChemESearch = new PubChemESearch();
                     PubChemClient pubChemClient = new PubChemClient(pubChemESearch);
                     String url = pubChemClient.getDownloadURL(PubchemTools.getMassRange(searchMass, massError));
-                    sdfPath = pubChemClient.saveFile(url, loc.trim());
+                    System.out.print(url);
+                    sdfPath = pubChemClient.saveFile(url,loc.trim());
+
 
                     break;
                 case Constants.ChemSpiderConstants.CHEMSPIDER_DB_NAME:
-                    String token = Constants.ChemSpiderConstants.CHEM_SPIDER_TOKEN;
-                    ChemSpiderClient client = ChemSpiderClient.getInstance(token, true);
-                    sdfPath = client.getChemicalStructuresByMass(searchMass, massError, loc.trim());
+                    ChemSpiderClientService client = new ChemSpiderClientService();
+                    try {
+                        sdfPath = client.getChemicalStructuresByMass(searchMass, massError, loc.trim());
+                    } catch (Base64DecodingException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case Constants.HMDBConstants.HMDB_DB_NAME:
                     HMDBClient hmdbClient = new HMDBClient();
                     double lowerVal = HMDBTools.getLowerMassValue(searchMass, massError);
                     double upperVal = HMDBTools.getUpperMassValue(searchMass, massError);
                     sdfPath = hmdbClient.searchHMDB(lowerVal, upperVal, loc.trim());
+                    System.out.print(sdfPath);
                     break;
                 default:
                     sdfPath = null;
                     break;
             }
-        } catch (ChemIDStructureException | RuntimeException | CDKException | IOException e) {
+        } catch (ChemIDStructureException | RuntimeException | CDKException | IOException | ParserConfigurationException | SAXException e) {
             LOGGER.error(Constants.ZERO_COMPOUNDS_ERROR_LOG, e);
 
         }
