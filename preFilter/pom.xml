@@ -43,6 +43,12 @@
             <artifactId>streamsupport</artifactId>
             <version>1.5.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -86,5 +92,6 @@
         <mvn.shade.version>2.4.1</mvn.shade.version>
         <gson.xml.version>0.1.7</gson.xml.version>
         <cheminformatics.version>1.0</cheminformatics.version>
+        <testng.version>6.1.1</testng.version>
     </properties>
 </project>
