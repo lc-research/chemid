@@ -18,6 +18,9 @@ public class Constants {
     public static final String SDF_FILE_NAME = "yyyyMMddhhmm'.sdf'";
 public static final String ZERO_COMPOUNDS_ERROR_LOG = "something going wrong.Failed to retrieve data from databases";
 public static final String NO_COMPOUNDS = "0 compounds!";
+
+
+
     public static class ChemSpiderConstants {
         public static final String CHEMSPIDER_DB_NAME = "chemspider";
         public static final String CHEM_SPIDER_TOKEN = "327be9cb-76c5-48cf-97df-9da48db88e85";
@@ -29,8 +32,25 @@ public static final String NO_COMPOUNDS = "0 compounds!";
         public static Integer CONNECTION_TIMEOUT = 180000;
         public static Integer SO_TIME_OUT = 18000;
         public static Integer THREAD_TIME_OUT = 1000;
-
-
+        public static String APIKEY = "EFgsAJKAewbSZddGUxx811SNa4gJAtw8";
+        public static int HTTP_SUCCES=200;
+        public static String QUERY_ID_URL="https://api.rsc.org/compounds/v1/filter/mass";
+        public static String CONTENT_TYPE="Content-Type";
+        public static String API_VALUE="apikey";
+        public static String POST_TYPE="POST";
+        public static String GET_TYPE="GET";
+        public static String APPLICATION_TYPE="application/json";
+        public static String POST_MESSAGE="POST NOT WORKED";
+        public static String POST_MASS="{\n" + "\"mass\":";
+        public static String POST_RANGE=",\r\n" + "    \"range\":";
+        public static String POST_DATA_SOURCES=",\r\n" + "\"component\": \"any\",\r\n" + "\"dataSources\": [\"ChemBridge\",\"ChemBlock\",\"ChemSpiderman\"],\r\n" + "\"orderBy\": \"default\",\r\n" + " \"orderDirection\": \"default\"" + "\n}";
+        public static String POST_QUERY_ID="https://api.rsc.org/compounds/v1/filter/";
+        public static String POST_SDF="/results/sdf";
+        public static String GET_AGENT="User-Agent";
+        public static String AGENT_TYPE="Mozilla/5.0";
+        public static String OUTPUT_TYPE=".sdf";
+        public static String GET_MESSAGE="Get method error";
+        public static String DECODE_MESSAGE="Fail to unzip";
     }
 
     public static class HMDBConstants {
