@@ -83,6 +83,7 @@ public static final String NO_COMPOUNDS = "0 compounds!";
         public static final String PUG_QUERY_RUNNING_STATUS_TAG_NAME = "<PCT-Status value=\"running\"/>";
         public static final String PUG_QUERY_SDF_DOWNLOAD_URL = "PCT-Download-URL_url";
 
+
     }
 
 

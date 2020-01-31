@@ -68,6 +68,7 @@ public class XmlParser {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
             doc = dBuilder.parse(new File(resource.getPath()));
+           // System.out.println("This is doc"+doc);
         } catch (SAXException | IOException | ParserConfigurationException e) {
 
             throw new ChemIDStructureException("Error occurred in xml Parser getXMLPayload : ", e);
