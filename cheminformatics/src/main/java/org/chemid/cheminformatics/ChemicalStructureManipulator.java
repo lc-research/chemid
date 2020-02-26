@@ -52,6 +52,7 @@ public class ChemicalStructureManipulator {
 
     public static String Structures(Filters filters) throws CheminformaticsException, IOException {
 
+        System.out.println(filters.inputFilePath);
         if(filters.inputFilePath==null){
 
             return Constants.FILE_NOT_FOUND;
@@ -62,6 +63,7 @@ public class ChemicalStructureManipulator {
 
             try {
                 String outputpath = (generateOutputFileName(filters.inputFilePath));
+                System.out.println(outputpath);
                 SDFWriter sdfWriter = new SDFWriter(new FileWriter(new File(outputpath)));
                 IteratingSDFReader sdfReader = new IteratingSDFReader(new FileInputStream(filters.inputFilePath), DefaultChemObjectBuilder.getInstance());
                 Iterable<IAtomContainer> iterables = () -> sdfReader;
@@ -116,7 +118,7 @@ public class ChemicalStructureManipulator {
 
                             if (filters.keepPositiveCharges || filters.eliminateCharges) {
                                 molCharge = AtomContainerManipulator.getTotalFormalCharge(iAtomContainer);
-                                System.out.println(molCharge);
+
                                 if (filters.keepPositiveCharges) {
                                     if (molCharge > 0) {
                                         return true;
@@ -157,6 +159,7 @@ public class ChemicalStructureManipulator {
             return Constants.PROPERTY_UPDATED;
         }
     }
+
 
     /**Update Sterio Isomers
      *

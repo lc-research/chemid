@@ -31,7 +31,7 @@ public class CommonClass {
    public static String createOuputSDF(String ouputSDFpath){
         int index = ouputSDFpath.lastIndexOf('/');
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName ="id_"+dateFormat.format(timestamp);
+        String fileName ="id_"+dateFormat.format(timestamp)+".sdf";
         String newsdf = ouputSDFpath.substring(0, index);
         String newFilePath = newsdf+"/"+fileName;
         return newFilePath;
@@ -46,7 +46,7 @@ public class CommonClass {
     public static String generateOutputFileName(String ouputSDFpath){
         int index = ouputSDFpath.lastIndexOf('/');
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        String fileName ="preFilter_"+dateFormat.format(timestamp);
+        String fileName ="preFilter_"+dateFormat.format(timestamp)+".sdf";
         String newsdf = ouputSDFpath.substring(0, index);
         String newFilePath = newsdf+"/"+fileName;
         return newFilePath;
