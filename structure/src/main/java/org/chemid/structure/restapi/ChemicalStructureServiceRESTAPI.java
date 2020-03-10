@@ -84,9 +84,7 @@ public class ChemicalStructureServiceRESTAPI {
                     PubChemESearch pubChemESearch = new PubChemESearch();
                     PubChemClient pubChemClient = new PubChemClient(pubChemESearch);
                     String url = pubChemClient.getDownloadURL(PubchemTools.getMassRange(searchMass, massError));
-                    System.out.print(url);
                     sdfPath = pubChemClient.saveFile(url,loc.trim());
-
 
                     break;
                 case Constants.ChemSpiderConstants.CHEMSPIDER_DB_NAME:
@@ -102,7 +100,6 @@ public class ChemicalStructureServiceRESTAPI {
                     double lowerVal = HMDBTools.getLowerMassValue(searchMass, massError);
                     double upperVal = HMDBTools.getUpperMassValue(searchMass, massError);
                     sdfPath = hmdbClient.searchHMDB(lowerVal, upperVal, loc.trim());
-                    System.out.print(sdfPath);
                     break;
                 default:
                     sdfPath = null;
