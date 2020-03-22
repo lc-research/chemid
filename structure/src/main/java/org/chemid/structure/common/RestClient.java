@@ -25,29 +25,7 @@ import java.util.Scanner;
 public class RestClient {
 
     public WebTarget getWebResource(String Url) {
-
-
-        //System.out.println("Set proxy :");
-      //  Scanner sc = new Scanner(System.in);
-      //  Client client=null;
-      //  boolean b = sc.nextBoolean();
         ClientConfig config = new ClientConfig();
-
-        /*config.property(ApacheClientProperties.PROXY_URI, proxyUrl);
-        Connector connector = new ApacheConnector(config);
-        config.connector(connector);*/
-
-
-        /*if(b){
-            config.property(ClientProperties.PROXY_URI, "cachex.pdn.ac.lk:3128");
-             client = ClientBuilder.newClient(config);
-        }
-        else {
-             client = ClientBuilder.newClient(config);
-        }/
-      config.property(ApacheClientProperties.PROXY_URI, proxyUrl);
-        Connector connector = new ApacheConnector(config);
-        config.connector(connector);*/
         Client client = ClientBuilder.newClient(config);
         return client.target(Url);
     }
