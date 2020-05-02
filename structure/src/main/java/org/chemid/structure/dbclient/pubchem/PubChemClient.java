@@ -186,7 +186,7 @@ public class PubChemClient {
                 URL url = new URL(fileUrl);
                 File dir = new File(location);
                 dir.mkdirs();
-                String fileName = new SimpleDateFormat(Constants.SDF_FILE_NAME).format(new Date());
+                String fileName = new SimpleDateFormat(Constants.ZIP_FILE_NAME).format(new Date());
                 File tmp = new File(dir, (Constants.PubChemClient.PUBCHEM_DB_NAME+fileName));
                 tmp.createNewFile();
                 FileUtils.copyURLToFile(url, tmp);
