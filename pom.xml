@@ -83,7 +83,7 @@
 
     </dependencies>
     <properties>
-        <jetty.version>9.3.2.v20150730</jetty.version>
+        <jetty.version>9.3.25.v20180904</jetty.version>
         <jersy.version>2.7</jersy.version>
         <logback.version>1.0.13</logback.version>
         <testng.version>6.1.1</testng.version>
