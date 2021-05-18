@@ -52,10 +52,10 @@ public class ChemicalIdRESTAPI {
      * @param weightECOM50 : ECOM50 weight
      * @param weightCCS : CCS weight
      * @param weightCFMID : CFMID weight
-     * @param keepweightRI : Boolean of RI
-     * @param keepweightECOM50 : Boolean of ECMO50
-     * @param keepweightCCS : Boolean of CCS
-     * @param keepweightCFMID : Boolean of CFMID
+     * @param keepRI : Boolean of RI
+     * @param keepECOM50 : Boolean of ECMO50
+     * @param keepCCS : Boolean of CCS
+     * @param keepCFMID : Boolean of CFMID
      * @return String of output path
      * @throws IOException
      */
@@ -63,7 +63,7 @@ public class ChemicalIdRESTAPI {
     @Path("/rank")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
-                @FormParam("inputSDFpath") String inputSDFpath,
+                @FormParam("inputFilepath") String inputSDFpath,
                 @FormParam("experimentalRI") double valueRI,
                 @FormParam("experimentalECOM50") double valueECOM50,
                 @FormParam("experimentalCCS") double valueCCS,
@@ -72,10 +72,10 @@ public class ChemicalIdRESTAPI {
                 @FormParam("weightECOM50")double weightECOM50,
                 @FormParam("weightCCS")double weightCCS,
                 @FormParam("weightCFMID")double weightCFMID,
-                @FormParam("keepRIWeight")boolean keepweightRI,
-                @FormParam("keepECOM50Weight")boolean keepweightECOM50,
-                @FormParam("keepCCSweight")boolean keepweightCCS,
-                @FormParam("keepCFMIDweight")boolean keepweightCFMID
+                @FormParam("keepRI")boolean keepRI,
+                @FormParam("keepECOM50")boolean keepECOM50,
+                @FormParam("keepCCS")boolean keepCCS,
+                @FormParam("keepCFMID")boolean keepCFMID
     ) throws IOException {
 
         String outPutPath = null;
@@ -85,7 +85,7 @@ public class ChemicalIdRESTAPI {
         }
         else {
             outPutPath = calWeightProperty(inputSDFpath, valueRI, valueECOM50, valueCCS, valueCFMID,
-                    weightRI, weightECOM50, weightCCS, weightCFMID, keepweightRI, keepweightECOM50, keepweightCCS, keepweightCFMID);
+                    weightRI, weightECOM50, weightCCS, weightCFMID, keepRI, keepECOM50, keepCCS, keepCFMID);
         }
         return outPutPath;
     }
