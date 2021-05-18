@@ -60,14 +60,14 @@ public class ChemicalIdRESTAPI {
      * @throws IOException
      */
     @POST
-    @Path("/property")
+    @Path("/rank")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
                 @FormParam("inputSDFpath") String inputSDFpath,
                 @FormParam("experimentalRI") double valueRI,
                 @FormParam("experimentalECOM50") double valueECOM50,
                 @FormParam("experimentalCCS") double valueCCS,
-                @FormParam("exprimnetalCFMID")double valueCFMID,
+                @FormParam("cfmIDScore")double valueCFMID,
                 @FormParam("weightRI")double weightRI,
                 @FormParam("weightECOM50")double weightECOM50,
                 @FormParam("weightCCS")double weightCCS,

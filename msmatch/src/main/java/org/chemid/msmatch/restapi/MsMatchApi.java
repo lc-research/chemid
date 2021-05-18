@@ -63,7 +63,7 @@ public class MsMatchApi {
      * @return String of output path
      */
     @POST
-    @Path("/rank")
+    @Path("/runCFMID")
     @Produces(MediaType.TEXT_HTML)
     public String rankCandidate(
             @FormParam("candidateFilePath") String candidateFilePath,
