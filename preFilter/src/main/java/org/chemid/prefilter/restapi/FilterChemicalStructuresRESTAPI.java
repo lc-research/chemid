@@ -54,7 +54,7 @@ public class FilterChemicalStructuresRESTAPI {
      * @return String of saved path
      */
     @POST
-    @Path("applyfilters")
+    @Path("applyPreFilters")
     @Produces(MediaType.TEXT_HTML)
     public String removeIrrelevantStructures(
             @FormParam("inputFilePath") String inputFilePath,

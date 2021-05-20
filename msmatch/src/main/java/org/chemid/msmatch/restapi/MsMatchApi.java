@@ -52,7 +52,7 @@ public class MsMatchApi {
 
     /**
      *
-     * @param candidateFilePath : File Path to Input SD File
+     * @param inputFilePath : File Path to Input SD File
      * @param spectrumFilePath : File Path to Spectrum File
      * @param ppmMassTollerence : Mass tolerance in ppm
      * @param absMassTollerence : Absolute mass tolerance in Daltons
@@ -66,7 +66,7 @@ public class MsMatchApi {
     @Path("/runCFMID")
     @Produces(MediaType.TEXT_HTML)
     public String rankCandidate(
-            @FormParam("candidateFilePath") String candidateFilePath,
+            @FormParam("inputFilePath") String inputFilePath,
             @FormParam("spectrumFilePath") String spectrumFilePath,
             @FormParam("ppmMassTollerence") double ppmMassTollerence,
             @FormParam("absMassTollerence") double absMassTollerence,
@@ -75,12 +75,12 @@ public class MsMatchApi {
             @FormParam("outputFilePath") String outputFilePath,
             @FormParam("algorithm") String algorithm) {
         String outPutPath = null;
-        File sdfFile = new File(candidateFilePath);
+        File sdfFile = new File(inputFilePath);
         ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
         //CDK dependecies method import from Cheminfomatics
         getmolProperty(sdfFile,Constants.PUBCHEM_COMPOUND_CID,Constants.CHEMSPIDER_CSID,Constants.HMDB_ID,map);
         String newCandidateFilePAth = null;
-        newCandidateFilePAth=saveNewCandidateFile(candidateFilePath, map);
+        newCandidateFilePAth=saveNewCandidateFile(inputFilePath, map);
 
         if (algorithm.equals(Constants.CFMID)) {
             CFMIDAlgorithm cfm = new CFMIDAlgorithm();
@@ -101,7 +101,7 @@ public class MsMatchApi {
         try {
             File createdFile=getLatestFilefromDir(outputFilePath);
             HashMap<String,String>val=getScores(createdFile);
-            addPropertySDF(candidateFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath),"CFMIDScore");
+            addPropertySDF(inputFilePath,val,getpath.createMsMatchOuputSDF(outputFilePath),"CFMIDScore");
         } catch (IOException e) {
             e.printStackTrace();
         }

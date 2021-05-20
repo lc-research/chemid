@@ -43,7 +43,7 @@ public class ChemicalIdRESTAPI {
 
     /**
      *
-     * @param inputSDFpath : File Path to Input SD File
+     * @param inputFilePath : File Path to Input SD File
      * @param valueRI : Experimental RI Value
      * @param valueECOM50 : Experimental ECOM50 Value
      * @param valueCCS : Experimental CCS Value
@@ -63,7 +63,7 @@ public class ChemicalIdRESTAPI {
     @Path("/rank")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
-                @FormParam("inputFilepath") String inputSDFpath,
+                @FormParam("inputFilepath") String inputFilePath,
                 @FormParam("experimentalRI") double valueRI,
                 @FormParam("experimentalECOM50") double valueECOM50,
                 @FormParam("experimentalCCS") double valueCCS,
@@ -79,12 +79,12 @@ public class ChemicalIdRESTAPI {
     ) throws IOException {
 
         String outPutPath = null;
-        if(inputSDFpath==null){
+        if(inputFilePath==null){
 
             outPutPath=Constants.FILE_PATH_EMPTY;
         }
         else {
-            outPutPath = calWeightProperty(inputSDFpath, valueRI, valueECOM50, valueCCS, valueCFMID,
+            outPutPath = calWeightProperty(inputFilePath, valueRI, valueECOM50, valueCCS, valueCFMID,
                     weightRI, weightECOM50, weightCCS, weightCFMID, keepRI, keepECOM50, keepCCS, keepCFMID);
         }
         return outPutPath;

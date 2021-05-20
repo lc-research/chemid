@@ -43,26 +43,26 @@ public class FilterRESTAPI {
 
 
     @POST
-    @Path("/filterProperty")
+    @Path("/applyFilter")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public String addProperty(
-                @FormParam("inputSDFpath") String inputSDFpath,
-                @FormParam("inputFilepath") String inputFilepath,
+                @FormParam("inputFilePath") String inputFilePath,
+                @FormParam("propertyFilePath") String propertyFilePath,
                 @FormParam("experinmentalValue") double experinmentalValue,
                 @FormParam("error") double error,
                 @FormParam("propertyName")String propertyName
 
     ) throws IOException {
         CommonClass getpath = new CommonClass();
-        String outputSDFpath=getpath.generateOutputFileName(inputSDFpath);
-        HashMap<String,String> hashMapValues=getFilterValues(inputFilepath,experinmentalValue,error);
+        String outputSDFpath=getpath.generateOutputFileName(inputFilePath);
+        HashMap<String,String> hashMapValues=getFilterValues(propertyFilePath,experinmentalValue,error);
         String outPutPath = null;
-        if(inputSDFpath==null){
+        if(inputFilePath==null){
 
             outPutPath=Constants.FILE_PATH_EMPTY;
         }
         else {
-           addPropertySDF(inputSDFpath,hashMapValues,outputSDFpath,propertyName);
+           addPropertySDF(inputFilePath,hashMapValues,outputSDFpath,propertyName);
 
         }
         return outPutPath;
